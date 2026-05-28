@@ -7,6 +7,7 @@ from typing import Dict, Any
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.api.v1.auth import router as auth_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -14,6 +15,9 @@ app = FastAPI(
     docs_url="/docs",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
+
+# Register routers
+app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 
 # CORS Middleware config
 # In production, this should be locked down to the frontend domain

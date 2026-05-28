@@ -992,6 +992,44 @@ add_paragraph(doc, (
 ))
 
 # ─────────────────────────────────────────────
+# SECTION 15: PHASE 2 — AUTHENTICATION & MULTI-TENANT RBAC LOGIC
+# ─────────────────────────────────────────────
+
+doc.add_page_break()
+add_heading(doc, '15. Phase 2 — Authentication & Multi-Tenant RBAC (CTO Journal)', level=1, color='4F46E5')
+add_divider(doc)
+
+add_paragraph(doc, (
+    'Phase 2 secures the platform utilizing stateless asymmetric RS256 JWT tokens. '
+    'The Edge Middleware (Next.js) and API Gateway (FastAPI) collaborate to enforce permissions.'
+))
+
+add_heading(doc, '15.1 Asymmetric Signature Verification Sequence', level=2)
+add_paragraph(doc, (
+    'The FastAPI backend signs JWTs using an RS256 private key, while Next.js Edge Middleware verifies them '
+    'at the edge using only the public key, bypassing internal database network overhead.'
+))
+
+add_code_block(doc, '''[User Client Browser]
+       │  (Requests /admin/dashboard with HttpOnly cookie)
+       ▼
+[Next.js Edge Middleware]
+       │  (Imports RS256 public key)
+       ├─► Decodes & Verifies Refresh Token
+       ├─► Checks payload.role == 'InstitutionAdmin'
+       │        YES ──► Inject headers & Proceed
+       │        NO   ──► Redirect to /teacher/dashboard
+       ▼
+[FastAPI Endpoints] (Enforces database queries scoped to payload.institution_id)''')
+
+add_heading(doc, '15.2 Cookie Storage Policies & Replay Attack Mitigations', level=2)
+add_paragraph(doc, (
+    'Access tokens expire in 15 minutes and live solely in-memory. Refresh tokens expire in 7 days, '
+    'stored as HttpOnly, Secure, SameSite=Strict cookies. On token rotation (/refresh), the old token is '
+    'blacklisted in Redis for its remaining time-to-live to prevent reuse.'
+))
+
+# ─────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────
 
@@ -1020,4 +1058,5 @@ import os
 os.makedirs(os.path.dirname(output_path), exist_ok=True)
 doc.save(output_path)
 print(f"SUCCESS: Document saved to {output_path}")
+
 

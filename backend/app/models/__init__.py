@@ -7,6 +7,7 @@ from app.models.assignment import Assignment
 from app.models.submission import Submission
 from app.models.evaluation import AIEvaluation
 from app.models.audit_log import AuditLog
+from app.models.material_progress import MaterialProgress
 
 __all__ = [
     "Base",
@@ -18,4 +19,6 @@ __all__ = [
     "Submission",
     "AIEvaluation",
     "AuditLog",
+    "MaterialProgress",
 ]
+

@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -23,7 +24,9 @@ class User(Base):
     # status: pending_verification, active, suspended
     status: Mapped[str] = mapped_column(String(50), default="pending_verification", nullable=False)
     
-    institution_id: Mapped[uuid.UUID | None] = mapped_column(
+    # institution_id: Mapped[uuid.UUID | None] is fine since uuid.UUID is a type, not a string forward reference.
+    # However, to be consistent and fully safe, we can use Optional[uuid.UUID] here too.
+    institution_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey("institutions.id", ondelete="CASCADE"), nullable=True, index=True
     )
     created_at: Mapped[datetime] = mapped_column(
@@ -34,10 +37,10 @@ class User(Base):
     )
 
     # Relationships
-    institution: Mapped["Institution" | None] = relationship(
+    institution: Mapped[Optional["Institution"]] = relationship(
         "Institution", back_populates="users"
     )
-    profile: Mapped["Profile" | None] = relationship(
+    profile: Mapped[Optional["Profile"]] = relationship(
         "Profile", back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
     uploaded_materials: Mapped[list["Material"]] = relationship(

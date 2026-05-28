@@ -5,10 +5,13 @@ from sqlalchemy import text
 import redis.asyncio as aioredis
 from typing import Dict, Any
 
+import os
+from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.core.database import get_db
 from app.api.v1.auth import router as auth_router
 from app.api.v1.teachers import router as teachers_router
+from app.api.v1.materials import router as materials_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -17,9 +20,16 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
 
+# Ensure upload directories exist
+os.makedirs(os.path.join(os.getcwd(), "static", "uploads"), exist_ok=True)
+
 # Register routers
 app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(teachers_router, prefix=settings.API_V1_STR, tags=["teachers"])
+app.include_router(materials_router, prefix=f"{settings.API_V1_STR}/materials", tags=["materials"])
+
+# Mount static folder for local uploaded assets
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # CORS Middleware config
 # In production, this should be locked down to the frontend domain

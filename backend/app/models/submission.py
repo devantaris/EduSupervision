@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import String, Text, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import JSONB, ARRAY, INTEGER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -29,16 +30,16 @@ class Submission(Base):
     
     # status: pending, processing, evaluated, failed
     status: Mapped[str] = mapped_column(String(50), default="pending", nullable=False, index=True)
-    extracted_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    extracted_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
     # pgvector embedding: 768 dimensions for text-embedding-004
-    embedding: Mapped[list[float] | None] = mapped_column(Vector(768), nullable=True)
+    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(768), nullable=True)
     
     # MinHash signature for Layer 1 plagiarism detection (integer array)
-    minhash_sig: Mapped[list[int] | None] = mapped_column(ARRAY(INTEGER), nullable=True)
+    minhash_sig: Mapped[Optional[list[int]]] = mapped_column(ARRAY(INTEGER), nullable=True)
     
     # cached final score JSON for faster lookups
-    score_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    score_json: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
     
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -57,7 +58,7 @@ class Submission(Base):
     teacher: Mapped["User"] = relationship(
         "User", back_populates="submissions"
     )
-    evaluation: Mapped["AIEvaluation" | None] = relationship(
+    evaluation: Mapped[Optional["AIEvaluation"]] = relationship(
         "AIEvaluation", back_populates="submission", uselist=False, cascade="all, delete-orphan"
     )
 ColorMap = {"evaluated": "green", "processing": "blue", "pending": "yellow", "failed": "red"}

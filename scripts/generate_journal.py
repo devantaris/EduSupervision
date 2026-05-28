@@ -1074,6 +1074,46 @@ add_paragraph(doc, (
 ))
 
 # ─────────────────────────────────────────────
+# SECTION 17: PHASE 4 — TRAINING CONTENT & TELEMETRY
+# ─────────────────────────────────────────────
+
+doc.add_page_break()
+add_heading(doc, '17. Phase 4 — Training Content Delivery & Video Telemetry (CTO Journal)', level=1, color='4F46E5')
+add_divider(doc)
+
+add_paragraph(doc, (
+    'Phase 4 builds the core training materials pipeline. Administrators upload PDFs/videos directly '
+    'via direct uploads, and teachers stream materials with precise, low-overhead progress telemetry.'
+))
+
+add_heading(doc, '17.1 Direct Upload Presigning & Fallback Loop', level=2)
+add_paragraph(doc, (
+    'To support offline local dev at zero cost, the platform implements a dual-path upload loop. '
+    'If AWS configurations are missing, backend generates local server mock URLs. Frontend executes PUT requests '
+    'directly to the target destination, keeping the code matching production S3 behavior.'
+))
+
+add_code_block(doc, '''[Admin Upload Dropzone]
+       │  (Acquires upload URL from API)
+       ▼
+[FastAPI /materials/presign] 
+       ├─► AWS active  ──► Return AWS S3 Presigned PUT URL
+       └─► AWS missing ──► Return Local FastAPI PUT Endpoint
+       │
+       ▼  (Browser performs client-side direct PUT upload)
+[Target Destination] ──► Uploads directly to S3 or writes local disk
+       │
+       ▼  (Admin submits course metadata form)
+[FastAPI POST /materials] ──► Saves file_url/s3_key to DB''')
+
+add_heading(doc, '17.2 Telemetry Progress Throttling & keepalive Flush', level=2)
+add_paragraph(doc, (
+    'Video telemetry captures continuous player playtime positions. To optimize performance, '
+    'updates are saved to sessionStorage on timeupdate, throttled to 30-second interval updates to the DB '
+    'during playback, and flushed using keepalive fetch when tab is backgrounded or closed.'
+))
+
+# ─────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────
 

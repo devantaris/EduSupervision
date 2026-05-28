@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -16,13 +17,13 @@ class Material(Base):
         ForeignKey("institutions.id", ondelete="CASCADE"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
     # type: video, pdf, document
     type: Mapped[str] = mapped_column(String(50), nullable=False)
     file_url: Mapped[str] = mapped_column(String(512), nullable=False)
     
-    uploader_id: Mapped[uuid.UUID | None] = mapped_column(
+    uploader_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
     )
     created_at: Mapped[datetime] = mapped_column(
@@ -33,6 +34,6 @@ class Material(Base):
     institution: Mapped["Institution"] = relationship(
         "Institution", back_populates="materials"
     )
-    uploader: Mapped["User" | None] = relationship(
+    uploader: Mapped[Optional["User"]] = relationship(
         "User", back_populates="uploaded_materials"
     )

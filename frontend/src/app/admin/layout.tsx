@@ -29,6 +29,9 @@ export default function AdminLayout({
             <a href="/admin/teachers" className="block px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/40">
               Teacher Roster
             </a>
+            <a href="/admin/content" className="block px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/40">
+              Content Library
+            </a>
             <a href="/admin/assignments" className="block px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/40">
               Assignments
             </a>

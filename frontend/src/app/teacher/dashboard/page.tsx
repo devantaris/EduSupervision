@@ -1,6 +1,8 @@
-import React from "react";
+"use client";
 
-// Mock upcoming deadlines — in production these would come from apiFetch
+import React from "react";
+import Link from "next/link";
+
 const UPCOMING_DEADLINES = [
   {
     id: 1,
@@ -26,26 +28,25 @@ const UPCOMING_DEADLINES = [
 ];
 
 const LEARNING_PATH_STAGES = [
-  { label: "Foundation", emoji: "🌱", active: true, done: false },
-  { label: "Practice", emoji: "📚", active: false, done: false },
-  { label: "Advanced", emoji: "🔬", active: false, done: false },
-  { label: "Expert", emoji: "🏆", active: false, done: false },
+  { label: "Foundation", active: true, done: false },
+  { label: "Practice", active: false, done: false },
+  { label: "Advanced", active: false, done: false },
+  { label: "Expert", active: false, done: false },
 ];
 
 const MOTIVATIONAL_QUOTES = [
   {
-    quote:
-      "Education is not the filling of a pail, but the lighting of a fire.",
+    quote: "Education is not the filling of a pail, but the lighting of a fire.",
     author: "W.B. Yeats",
   },
 ];
 
 function urgencyStyles(daysLeft: number): string {
   if (daysLeft <= 3)
-    return "text-red-400 bg-red-950/50 border-red-900/50";
+    return "text-red-400 bg-[#1e0a0a] border-red-900/40";
   if (daysLeft <= 7)
-    return "text-amber-400 bg-amber-950/50 border-amber-900/50";
-  return "text-emerald-400 bg-emerald-950/50 border-emerald-900/50";
+    return "text-amber-400 bg-[#251b10] border-amber-900/40";
+  return "text-emerald-400 bg-[#091a13] border-emerald-900/40";
 }
 
 function urgencyLabel(daysLeft: number): string {
@@ -58,190 +59,182 @@ export default function TeacherDashboard() {
   const quote = MOTIVATIONAL_QUOTES[0];
 
   return (
-    <div className="space-y-10">
-      {/* ── Hero Greeting ── */}
-      <section>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-100 leading-tight">
-          Welcome back, Educator{" "}
-          <span className="inline-block animate-[wave_1.5s_ease-in-out_1]">👋</span>
+    <div className="space-y-12 max-w-7xl animate-slate-reveal select-none">
+      
+      {/* ── Hero Greeting (Editorial) ── */}
+      <section className="border-hairline-b pb-8 space-y-3">
+        <div className="inline-flex items-center gap-2 border border-gold/30 bg-amber-950/20 rounded px-2.5 py-0.5 text-[9px] tracking-widest uppercase text-gold animate-float-elastic">
+          <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse" />
+          Professional Development
+        </div>
+        <h1 className="font-serif text-4xl sm:text-5xl font-black uppercase text-white tracking-tight leading-tight">
+          Welcome back, <br />
+          <span className="gradient-text-gold">Educator Portfolio</span>
         </h1>
-        <p className="mt-2 text-slate-400 text-sm max-w-xl leading-relaxed">
-          Your professional development journey is underway. Keep learning,
-          keep growing — every module brings you closer to expert status.
+        <p className="text-slate-400 text-xs font-light max-w-xl">
+          Your professional training track is currently underway. Audit module progression, track watch hours, and submit rubric evaluations.
         </p>
       </section>
 
-      {/* ── Stat Cards ── */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        {/* Training Progress */}
-        <article className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/10 transition-all duration-200 space-y-3">
+      {/* ── Stat Plates (Asymmetrical) ── */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Progress Plate */}
+        <article className="border-hairline p-6 bg-[#0d0d0f]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
+          <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
               Training Progress
             </span>
-            <span className="text-xl">🎓</span>
+            <span className="text-sm opacity-40 group-hover:opacity-100 transition-opacity">🎓</span>
           </div>
-          <div className="flex items-end gap-2">
-            <span className="text-4xl font-black text-slate-100">0%</span>
+          <div className="space-y-2 mt-4">
+            <div className="flex items-baseline gap-2">
+              <span className="font-serif text-5xl font-black text-white tracking-tighter">0%</span>
+            </div>
+            {/* Elegant Sand progress bar */}
+            <div className="w-full h-1 bg-zinc-900 overflow-hidden rounded">
+              <div
+                className="h-full bg-gradient-to-r from-gold to-flame transition-all duration-700"
+                style={{ width: "0%" }}
+              />
+            </div>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">No hours tracked yet</p>
           </div>
-          {/* Mini progress bar */}
-          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-              style={{ width: "0%" }}
-            />
-          </div>
-          <p className="text-[10px] text-slate-500">No training videos started yet</p>
         </article>
 
-        {/* Pending Submissions */}
-        <article className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 shadow-xl hover:-translate-y-1 hover:shadow-amber-500/10 transition-all duration-200 space-y-3">
+        {/* Pending Submissions Plate */}
+        <article className="border-hairline p-6 bg-[#0d0d0f]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
+          <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-              Pending Submissions
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
+              Awaiting Action
             </span>
-            <span className="text-xl">📋</span>
+            <span className="text-sm opacity-40 group-hover:opacity-100 transition-opacity">📋</span>
           </div>
-          <div className="flex items-end gap-2">
-            <span className="text-4xl font-black text-slate-100">3</span>
-            <span className="text-sm text-amber-400 font-semibold mb-1">due soon</span>
+          <div className="space-y-2 mt-4">
+            <div className="flex items-baseline gap-2">
+              <span className="font-serif text-5xl font-black text-white tracking-tighter">3</span>
+              <span className="text-[10px] uppercase tracking-widest text-flame font-black animate-pulse">Pending</span>
+            </div>
+            {/* Visual indicators */}
+            <div className="flex gap-1.5">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex-1 h-1 bg-flame/60 rounded" />
+              ))}
+            </div>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Assignments awaiting essay file</p>
           </div>
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="flex-1 h-1.5 rounded-full bg-amber-500/60"
-              />
-            ))}
-          </div>
-          <p className="text-[10px] text-slate-500">3 assignments awaiting your submission</p>
         </article>
 
-        {/* Evaluation Score */}
-        <article className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 shadow-xl hover:-translate-y-1 hover:shadow-emerald-500/10 transition-all duration-200 space-y-3">
+        {/* Evaluation Score Plate */}
+        <article className="border-hairline p-6 bg-[#0d0d0f]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
+          <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-              Evaluation Score
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
+              Mean Evaluation
             </span>
-            <span className="text-xl">⭐</span>
+            <span className="text-sm opacity-40 group-hover:opacity-100 transition-opacity">⭐</span>
           </div>
-          <div className="flex items-end gap-2">
-            <span className="text-4xl font-black text-slate-100">—</span>
+          <div className="space-y-2 mt-4">
+            <div className="flex items-baseline gap-2">
+              <span className="font-serif text-5xl font-black text-slate-400 tracking-tighter">—</span>
+            </div>
+            <div className="flex gap-1">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex-1 h-1 bg-zinc-900 rounded" />
+              ))}
+            </div>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Requires first evaluated grade</p>
           </div>
-          <div className="flex gap-0.5">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="flex-1 h-1.5 rounded-full bg-slate-800"
-              />
-            ))}
-          </div>
-          <p className="text-[10px] text-slate-500">Complete assignments to receive scores</p>
         </article>
       </section>
 
-      {/* ── My Learning Path ── */}
-      <section className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
-        <div className="flex items-center justify-between">
+      {/* ── Asymmetrical CPD Stage Timeline ── */}
+      <section className="border border-hairline p-8 bg-[#0c0c0e]/30 relative flex flex-col gap-6">
+        <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
+        <div className="flex items-center justify-between border-hairline-b pb-4">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-100">My Learning Path</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Your personalised CPD progression stages
+            <h2 className="font-serif text-lg font-bold text-white uppercase tracking-widest">My Learning Pathway</h2>
+            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">
+              District Certifications Sequence
             </p>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-indigo-950/60 text-indigo-400 border border-indigo-800/60">
+          <span className="text-[9px] tracking-widest uppercase bg-amber-950/20 text-gold border border-gold/30 px-3 py-1 font-bold">
             Stage 1 of 4
           </span>
         </div>
 
-        {/* Stage track */}
-        <div className="flex items-center gap-0">
-          {LEARNING_PATH_STAGES.map((stage, idx) => {
-            const isLast = idx === LEARNING_PATH_STAGES.length - 1;
-            return (
-              <React.Fragment key={stage.label}>
-                {/* Stage node */}
-                <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl transition-all duration-200 shadow-lg ${
-                      stage.done
-                        ? "bg-emerald-600 shadow-emerald-500/30"
-                        : stage.active
-                        ? "bg-indigo-600 shadow-indigo-500/30 ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-900"
-                        : "bg-slate-800 opacity-50"
-                    }`}
-                  >
-                    {stage.done ? "✅" : stage.emoji}
-                  </div>
-                  <span
-                    className={`text-[10px] font-bold uppercase tracking-wider ${
-                      stage.active
-                        ? "text-indigo-400"
-                        : stage.done
-                        ? "text-emerald-400"
-                        : "text-slate-600"
-                    }`}
-                  >
-                    {stage.label}
-                  </span>
-                </div>
-
-                {/* Connector line */}
-                {!isLast && (
-                  <div className="flex-1 h-0.5 mx-2 mb-5 rounded-full bg-slate-800 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-700 ${
-                        stage.done ? "w-full" : "w-0"
-                      }`}
-                    />
-                  </div>
+        {/* Horizontal Stage Timeline */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-4">
+          {LEARNING_PATH_STAGES.map((stage, idx) => (
+            <div
+              key={stage.label}
+              className={`p-4 border relative flex flex-col justify-between group min-h-[110px]
+                ${stage.active ? 'border-gold bg-[#14100e] text-gold' : 'border-hairline bg-[#0d0d0f]/20 opacity-50'}
+              `}
+            >
+              <div className="flex justify-between items-start">
+                <span className="font-serif text-[10px] tracking-widest uppercase font-bold text-slate-400">
+                  Step 0{idx + 1}
+                </span>
+                {stage.active && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse-ring" />
                 )}
-              </React.Fragment>
-            );
-          })}
+              </div>
+              
+              <span className="text-xs font-serif uppercase tracking-widest font-black text-white group-hover:text-gold transition-colors duration-300">
+                {stage.label}
+              </span>
+            </div>
+          ))}
         </div>
 
-        <p className="text-xs text-slate-500 leading-relaxed">
-          You&apos;re currently in the{" "}
-          <span className="text-indigo-400 font-semibold">Foundation</span>{" "}
-          stage. Complete your first 5 modules to unlock the Practice stage.
+        <p className="text-[10px] text-slate-400 leading-relaxed font-light">
+          You are currently active in the <span className="text-gold font-bold">Foundation</span> stage of Oakridge Academy&apos;s professional curriculum. 
+          Complete the active modules to unlock developmental evaluations.
         </p>
       </section>
 
-      {/* ── Bottom two-col: Deadlines + Continue Learning ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Upcoming Deadlines */}
-        <section className="lg:col-span-2 bg-slate-900/40 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-extrabold text-slate-100">Upcoming Deadlines</h2>
-            <a
+      {/* ── Deadlines & Continue Learning Workspace ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Deadlines Feed (col-span-8) */}
+        <section className="lg:col-span-8 border-hairline p-8 bg-[#0d0d0f]/20 relative flex flex-col gap-6">
+          <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
+          <div className="flex items-center justify-between border-hairline-b pb-4">
+            <h2 className="font-serif text-lg font-bold text-white uppercase tracking-widest">
+              Upcoming Submissions
+            </h2>
+            <Link
               href="/teacher/assignments"
-              className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-[10px] tracking-widest uppercase font-bold text-gold hover:text-white transition-colors"
             >
-              View all →
-            </a>
+              View Dossier →
+            </Link>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {UPCOMING_DEADLINES.map((deadline) => (
               <div
                 key={deadline.id}
-                className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-800/30 border border-slate-800/60 hover:bg-slate-800/50 transition-all duration-200"
+                className="flex items-center justify-between p-4 border border-hairline bg-background/50 hover:bg-[#121214]/50 transition-all duration-300 group"
               >
-                <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-lg shrink-0">
-                  📝
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded border border-hairline bg-background flex items-center justify-center shrink-0 text-sm">
+                    📝
+                  </div>
+                  <div>
+                    <p className="text-xs font-serif font-black text-white group-hover:text-gold transition-colors duration-300">
+                      {deadline.title}
+                    </p>
+                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-0.5">
+                      {deadline.subject}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-200 truncate">
-                    {deadline.title}
-                  </p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">{deadline.subject}</p>
-                </div>
-                <span
-                  className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold border ${urgencyStyles(
-                    deadline.daysLeft
-                  )}`}
-                >
+                
+                <span className={`px-2.5 py-1 text-[8px] tracking-widest uppercase font-bold border ${urgencyStyles(deadline.daysLeft)}`}>
                   {urgencyLabel(deadline.daysLeft)}
                 </span>
               </div>
@@ -249,46 +242,48 @@ export default function TeacherDashboard() {
           </div>
         </section>
 
-        {/* Continue Learning CTA */}
-        <section className="flex flex-col gap-5">
-          <div className="bg-gradient-to-br from-indigo-900/60 via-purple-900/40 to-slate-900/60 border border-indigo-800/50 rounded-2xl p-6 shadow-xl flex flex-col justify-between gap-5 hover:-translate-y-1 transition-all duration-200">
-            <div>
-              <div className="text-2xl mb-3">🚀</div>
-              <h3 className="text-base font-extrabold text-slate-100">
-                Continue Learning
+        {/* Continue Learning Action (col-span-4) */}
+        <section className="lg:col-span-4 flex flex-col">
+          <div className="flex-1 border border-hairline bg-[#0d0d0f]/20 p-8 flex flex-col justify-between min-h-[220px] relative">
+            <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
+            
+            <div className="space-y-4">
+              <span className="text-2xl">🚀</span>
+              <h3 className="font-serif text-base font-bold uppercase tracking-widest text-white">
+                Resume Curriculum
               </h3>
-              <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                Pick up where you left off — your training library is just one
-                click away.
+              <p className="text-[10px] text-slate-400 font-light leading-relaxed">
+                Continue precisely where you left off. The training catalog has telemetry progress tracking active.
               </p>
             </div>
-            <a
+            
+            <Link
               href="/teacher/training"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-gold hover:bg-[#ebd5b5] text-black text-xs tracking-widest uppercase font-black transition-all duration-300"
             >
-              <span>Open Library</span>
-              <span>→</span>
-            </a>
+              Open Catalogue
+            </Link>
           </div>
         </section>
       </div>
 
-      {/* ── Motivational Quote ── */}
-      <section className="relative overflow-hidden bg-slate-900/30 border border-slate-800/60 rounded-2xl p-6 shadow-xl">
-        {/* Decorative blobs */}
-        <div className="absolute -top-6 -right-6 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+      {/* ── Inspiration Quote (Editorial Panel) ── */}
+      <section className="border border-hairline p-8 bg-[#0d0d0f]/20 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
+        
+        {/* Subtle background glow */}
+        <div className="absolute top-1/2 right-[10%] w-64 h-64 bg-amber-950/5 rounded-full blur-[80px] pointer-events-none" />
 
-        <div className="relative flex items-start gap-4">
-          <div className="text-3xl mt-0.5 shrink-0">💡</div>
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400">
-              Daily Inspiration
+        <div className="flex items-start gap-4 max-w-2xl relative z-10">
+          <div className="text-2xl mt-0.5 shrink-0 opacity-40">💡</div>
+          <div className="space-y-2">
+            <p className="text-[8px] uppercase tracking-widest text-gold font-black">
+              Educational Focus
             </p>
-            <blockquote className="text-slate-300 font-medium text-sm leading-relaxed italic">
-              &quot;{quote.quote}&quot;
+            <blockquote className="font-serif text-lg text-white font-medium italic leading-relaxed">
+              &ldquo;{quote.quote}&rdquo;
             </blockquote>
-            <p className="text-xs text-slate-500 font-semibold">— {quote.author}</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">— {quote.author}</p>
           </div>
         </div>
       </section>

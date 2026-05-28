@@ -7,86 +7,77 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-stretch bg-slate-950 text-slate-100">
-      {/* ── LEFT BRAND PANEL (desktop only) ── */}
-      <aside className="hidden lg:flex lg:w-[45%] xl:w-[42%] relative flex-col justify-between overflow-hidden">
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950" />
-
-        {/* Decorative blobs */}
-        <div
-          aria-hidden="true"
-          className="absolute -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-indigo-600/20 blur-3xl animate-pulse-glow"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute bottom-0 right-0 w-[340px] h-[340px] rounded-full bg-purple-600/15 blur-3xl animate-pulse-glow-slow"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute top-1/2 left-1/4 w-[200px] h-[200px] rounded-full bg-emerald-500/10 blur-2xl animate-pulse-glow-fast"
-        />
-
-        {/* Decorative grid overlay */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+    <div className="min-h-screen flex items-stretch bg-background text-foreground font-sans relative select-none">
+      
+      {/* ══════════════════════════════════════════
+          LEFT BRAND DOSSIER PANEL (DESKTOP)
+      ══════════════════════════════════════════ */}
+      <aside className="hidden lg:flex lg:w-[45%] xl:w-[42%] relative flex-col justify-between overflow-hidden border-hairline-r">
+        {/* Deep copper/amber organic backdrops */}
+        <div aria-hidden="true" className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#100b09] via-background to-[#17110c]" />
+          <div
+            className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-15 animate-drift-organic blur-[100px]"
+            style={{
+              background: "radial-gradient(circle, var(--accent-amber) 0%, var(--accent-copper) 60%, transparent 100%)",
+            }}
+          />
+          <div
+            className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full opacity-10 animate-drift-organic-slow blur-[80px]"
+            style={{
+              background: "radial-gradient(circle, var(--accent-copper) 0%, transparent 70%)",
+            }}
+          />
+          {/* Fine structural grid lines */}
+          <div className="absolute inset-0 opacity-[0.025] bg-[linear-gradient(to_right,var(--accent-gold)_1px,transparent_1px),linear-gradient(to_bottom,var(--accent-gold)_1px,transparent_1px)] bg-[size:30px_30px]" />
+        </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between h-full p-10 xl:p-14">
-          {/* Logo */}
-          <Link href="/" className="inline-flex items-center gap-2 group">
-            <div className="h-9 w-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-lg">
-              🎓
-            </div>
-            <span className="text-xl font-extrabold gradient-text">
+        <div className="relative z-10 flex flex-col justify-between h-full p-12 xl:p-16">
+          
+          {/* Top Header Logo */}
+          <Link href="/" className="inline-flex items-center gap-2.5 group">
+            <span className="font-serif text-xl tracking-widest font-black uppercase text-gold group-hover:text-white transition-colors duration-300">
               EduSupervision
             </span>
           </Link>
 
-          {/* Center content */}
-          <div className="space-y-8">
+          {/* Center Brand Dossier */}
+          <div className="space-y-10 my-auto">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 bg-indigo-950/60 border border-indigo-800/50 rounded-full px-3 py-1 text-xs text-indigo-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Enterprise Platform · v1.0
+              <div className="inline-flex items-center gap-2 border-hairline bg-amber-950/20 rounded px-2.5 py-1 text-[9px] tracking-widest uppercase text-gold animate-float-elastic">
+                <span className="h-1 w-1 rounded-full bg-flame animate-pulse" />
+                Enterprise Sec-Bound
               </div>
 
-              <h2 className="text-3xl xl:text-4xl font-extrabold text-slate-100 leading-tight">
-                Elevate every{" "}
-                <span className="gradient-text">educator</span> in<br />
-                your institution.
+              <h2 className="font-serif text-3xl xl:text-4xl font-black uppercase tracking-tight leading-[1.05] text-white">
+                Rethinking <br />
+                <span className="gradient-text-flame font-sans font-extrabold normal-case tracking-tight">Educational Quality</span> <br />
+                As a Core Metric.
               </h2>
 
-              <p className="text-slate-400 text-sm xl:text-base leading-relaxed max-w-sm">
-                AI-assisted training, objective evaluation, and real-time
-                progress telemetry — all in one platform built for modern
-                school districts.
+              <p className="text-slate-400 text-xs xl:text-sm font-light leading-relaxed max-w-sm">
+                Statistical dashboards, immutable vector indices, and high-frequency video telemetry. 
+                Purpose-built infrastructure for modern school districts.
               </p>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Micro Asymmetrical Stats Table */}
+            <div className="grid grid-cols-2 gap-4 border-t border-b border-hairline py-8">
               {[
-                { value: "500+", label: "Educators trained" },
-                { value: "98%", label: "Eval accuracy" },
-                { value: "30s", label: "Progress sync" },
-                { value: "SOC2", label: "Compliant" },
-              ].map((stat) => (
+                { value: "500+", label: "Educators" },
+                { value: "98%", label: "LLM Precision" },
+                { value: "30s", label: "Telemetry Sync" },
+                { value: "SOC2", label: "Security Compliant" },
+              ].map((stat, idx) => (
                 <div
                   key={stat.label}
-                  className="bg-slate-900/40 border border-slate-700/40 rounded-xl p-4"
+                  className={`flex flex-col gap-1 ${idx % 2 === 0 ? 'pr-4 border-hairline-r' : 'pl-4'}`}
                 >
-                  <div className="text-2xl font-black text-slate-100">
+                  <div className="font-serif text-xl font-bold text-gold">
                     {stat.value}
                   </div>
-                  <div className="text-xs uppercase tracking-widest text-slate-500 mt-0.5">
+                  <div className="text-[8px] uppercase tracking-widest text-slate-500 font-black">
                     {stat.label}
                   </div>
                 </div>
@@ -94,63 +85,57 @@ export default function AuthLayout({
             </div>
           </div>
 
-          {/* Educator quote */}
-          <blockquote className="border-l-2 border-indigo-500/60 pl-4 space-y-2">
-            <p className="text-slate-300 text-sm italic leading-relaxed">
-              &ldquo;EduSupervision transformed how we track professional
-              development across our district. The AI grading alone saved us
-              hundreds of reviewer-hours.&rdquo;
+          {/* Bottom Testimonial */}
+          <blockquote className="border-l border-flame/50 pl-4 space-y-2 max-w-sm">
+            <p className="text-slate-400 text-xs italic leading-relaxed font-light">
+              &ldquo;EduSupervision transformed how we track professional development across our district. 
+              The automated AI grading alone saved our administration hundreds of workload hours.&rdquo;
             </p>
-            <footer className="text-xs text-slate-500">
+            <footer className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
               — Dr. Maria Chen, Director of Curriculum, Lakeside USD
             </footer>
           </blockquote>
         </div>
       </aside>
 
-      {/* ── RIGHT FORM PANEL ── */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-8 relative">
-        {/* Subtle background texture */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.8) 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
+      {/* ══════════════════════════════════════════
+          RIGHT FORM PANEL (GLASS CARD OVERLAY)
+      ══════════════════════════════════════════ */}
+      <main className="flex-1 flex items-center justify-center p-6 sm:p-12 relative bg-background">
+        
+        {/* Subtle dot overlay */}
+        <div aria-hidden="true" className="absolute inset-0 opacity-[0.015] bg-[radial-gradient(var(--accent-gold)_1px,transparent_0)] bg-[size:24px_24px]" />
+        
+        {/* Background glow orb */}
+        <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-950/5 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* Background glow */}
-        <div
-          aria-hidden="true"
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-900/10 rounded-full blur-3xl pointer-events-none"
-        />
-
-        <div className="relative z-10 w-full max-w-lg">
-          {/* Mobile-only logo */}
-          <div className="lg:hidden text-center mb-8">
+        <div className="relative z-10 w-full max-w-lg space-y-6">
+          
+          {/* Mobile-only logo header */}
+          <div className="lg:hidden text-center mb-10 space-y-2">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="h-9 w-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-lg">
-                🎓
-              </div>
-              <span className="text-xl font-extrabold gradient-text">
+              <span className="font-serif text-2xl tracking-widest font-black uppercase text-gold">
                 EduSupervision
               </span>
             </Link>
-            <p className="text-slate-400 text-sm mt-2">
+            <p className="text-[10px] tracking-widest uppercase font-bold text-slate-500">
               AI-Powered Teacher Training &amp; Supervision
             </p>
           </div>
 
-          {/* Form card */}
-          <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-8 shadow-2xl shadow-slate-950/80">
+          {/* The Portal Glass Card */}
+          <div className="atelier-glass p-8 sm:p-10 shadow-2xl relative">
+            {/* Corner structural highlights */}
+            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-gold/40" />
+            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-gold/40" />
+            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-gold/40" />
+            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-gold/40" />
+            
             {children}
           </div>
 
-          <p className="text-center text-xs text-slate-600 mt-6">
-            &copy; {new Date().getFullYear()} EduSupervision. Enterprise
-            Edition.
+          <p className="text-center text-[9px] uppercase tracking-widest text-slate-600 font-bold">
+            &copy; {new Date().getFullYear()} EduSupervision. Institutional Grade.
           </p>
         </div>
       </main>

@@ -1,23 +1,43 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   CSS Variables
-───────────────────────────────────────────── */
+   Google Fonts Import
+   Cinzel (Serif), Lora (Serif), Plus Jakarta Sans (Sans-Serif)
+   ───────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+/* ─────────────────────────────────────────────
+   Design System Tokens (Atelier Theme)
+   ───────────────────────────────────────────── */
 :root {
-  --background: #020617; /* slate-950 */
-  --foreground: #f1f5f9; /* slate-100 */
+  --background: #09090b;        /* Warm ink black */
+  --foreground: #f4f4f5;        /* Chalk white */
+  --accent-orange: #ff453a;     /* Flame */
+  --accent-orange-rgb: 255, 69, 58;
+  --accent-gold: #e6c89c;       /* Sand gold */
+  --accent-gold-rgb: 230, 200, 156;
+  --accent-copper: #3b2314;     /* Deep copper */
+  --accent-amber: #251c10;      /* Warm amber */
+  
+  --border-hairline: rgba(230, 200, 156, 0.15); /* Sand gold hairline */
+  --border-flame: rgba(255, 69, 58, 0.2);       /* Flame hairline */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-flame: var(--accent-orange);
+  --color-gold: var(--accent-gold);
+  --color-copper: var(--accent-copper);
+  --color-amber: var(--accent-amber);
+  
+  --font-serif: "Cinzel", "Lora", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
 }
 
 /* ─────────────────────────────────────────────
-   Base Styles
-───────────────────────────────────────────── */
+   Base Styles & Reset
+   ───────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -31,57 +51,83 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 /* ─────────────────────────────────────────────
-   Custom Scrollbar
-───────────────────────────────────────────── */
+   Custom Editorial Scrollbar
+   ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a; /* slate-900 */
-  border-radius: 999px;
+  background: #0d0d0f;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155; /* slate-600 */
-  border-radius: 999px;
-  transition: background 0.2s;
+  background: rgba(230, 200, 156, 0.2); /* Sand gold alpha */
+  border-radius: 2px;
+  transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6366f1; /* indigo-500 */
+  background: var(--accent-orange); /* Flame accent on hover */
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0f172a;
+  scrollbar-color: rgba(230, 200, 156, 0.2) #0d0d0f;
 }
 
 /* ─────────────────────────────────────────────
    Selection
-───────────────────────────────────────────── */
+   ───────────────────────────────────────────── */
 ::selection {
-  background: #4f46e5; /* indigo-600 */
-  color: #ffffff;
+  background: var(--accent-orange);
+  color: #000000;
 }
 
 /* ─────────────────────────────────────────────
-   Gradient Text Utility
-───────────────────────────────────────────── */
+   Premium Typographic Gradients
+   ───────────────────────────────────────────── */
 .gradient-text {
   background: linear-gradient(
     135deg,
-    #818cf8 0%,   /* indigo-400 */
-    #c084fc 40%,  /* purple-400 */
-    #34d399 100%  /* emerald-400 */
+    var(--accent-gold) 0%,
+    #ffffff 45%,
+    var(--accent-orange) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    var(--accent-gold) 60%,
+    #bf9e65 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.gradient-text-flame {
+  background: linear-gradient(
+    135deg,
+    var(--accent-orange) 0%,
+    #ff807a 50%,
+    var(--accent-gold) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -90,88 +136,146 @@ body {
 }
 
 /* ─────────────────────────────────────────────
-   @keyframes: float
-   Subtle vertical bobbing for hero blobs / icons
-───────────────────────────────────────────── */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-14px);
-  }
+   Asymmetrical Editorial Borders
+   ───────────────────────────────────────────── */
+.border-hairline {
+  border: 1px solid var(--border-hairline);
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+.border-hairline-t {
+  border-top: 1px solid var(--border-hairline);
 }
 
-/* ─────────────────────────────────────────────
-   @keyframes: pulse-glow
-   Opacity/scale pulsing for glow blobs
-───────────────────────────────────────────── */
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.65;
-    transform: scale(1.08);
-  }
+.border-hairline-b {
+  border-bottom: 1px solid var(--border-hairline);
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 4s ease-in-out infinite;
+.border-hairline-l {
+  border-left: 1px solid var(--border-hairline);
 }
 
-/* Staggered variants */
-.animate-pulse-glow-slow {
-  animation: pulse-glow 6s ease-in-out infinite;
-}
-
-.animate-pulse-glow-fast {
-  animation: pulse-glow 3s ease-in-out infinite;
+.border-hairline-r {
+  border-right: 1px solid var(--border-hairline);
 }
 
 /* ─────────────────────────────────────────────
-   @keyframes: slide-up
-   Fade + translate upward on entry
-───────────────────────────────────────────── */
-@keyframes slide-up {
+   Atelier Glassmorphism
+   ───────────────────────────────────────────── */
+.atelier-glass {
+  background: rgba(9, 9, 11, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-hairline);
+}
+
+.atelier-glass-flame {
+  background: rgba(9, 9, 11, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-flame);
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: drift-organic
+   Organic drifting and morphing for ambient auroras
+   ───────────────────────────────────────────── */
+@keyframes drift-organic {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(40px, -60px) scale(1.15) rotate(120deg);
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.9) rotate(240deg);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(360deg);
+  }
+}
+
+.animate-drift-organic {
+  animation: drift-organic 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-drift-organic-slow {
+  animation: drift-organic 30s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: magnetic-elastic
+   Smooth elastic float for interactions
+   ───────────────────────────────────────────── */
+@keyframes float-elastic {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.02);
+  }
+}
+
+.animate-float-elastic {
+  animation: float-elastic 5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: slate-reveal
+   Asymmetric mask-wipe sliding reveal on entry
+   ───────────────────────────────────────────── */
+@keyframes slate-reveal {
   0% {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(40px) skewY(1.5deg);
   }
   100% {
     opacity: 1;
-    transform: translateY(0px);
+    transform: translateY(0px) skewY(0deg);
   }
 }
 
-.animate-slide-up {
-  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+.animate-slate-reveal {
+  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Stagger helpers */
-.animate-slide-up-delay-1 {
-  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+.animate-slate-reveal-delay-1 {
+  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
 }
 
-.animate-slide-up-delay-2 {
-  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+.animate-slate-reveal-delay-2 {
+  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
 }
 
-.animate-slide-up-delay-3 {
-  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+.animate-slate-reveal-delay-3 {
+  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
 }
 
 /* ─────────────────────────────────────────────
-   @keyframes: shimmer
-   Moving highlight for skeleton loaders / badges
-───────────────────────────────────────────── */
+   @keyframes: pulse-ring
+   Double layered glowing ring breathing effect
+   ───────────────────────────────────────────── */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0.4);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(var(--accent-orange-rgb), 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ─────────────────────────────────────────────
+   Shimmer Effect
+   ───────────────────────────────────────────── */
 @keyframes shimmer {
   0% {
     background-position: -200% center;
@@ -185,44 +289,17 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(99, 102, 241, 0.15) 50%,
+    rgba(230, 200, 156, 0.08) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
-  animation: shimmer 2.5s linear infinite;
+  animation: shimmer 3s linear infinite;
 }
 
 /* ─────────────────────────────────────────────
-   @keyframes: rotate-slow
-   Slow rotation for decorative rings / orbs
-───────────────────────────────────────────── */
-@keyframes rotate-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-rotate-slow {
-  animation: rotate-slow 18s linear infinite;
-}
-
-/* ─────────────────────────────────────────────
-   Glassmorphism helper
-───────────────────────────────────────────── */
-.glass {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(51, 65, 85, 0.5);
-}
-
-/* ─────────────────────────────────────────────
-   Focus ring override — use indigo
-───────────────────────────────────────────── */
+   Focus ring override — sand gold
+   ───────────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid #6366f1;
-  outline-offset: 2px;
+  outline: 1.5px solid var(--accent-gold);
+  outline-offset: 3px;
 }

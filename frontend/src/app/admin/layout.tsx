@@ -41,6 +41,13 @@ const NAV_ITEMS = [
       <span className="text-base">🧠</span>
     ),
   },
+  {
+    href: "/admin/analytics",
+    label: "Analytics",
+    icon: (
+      <span className="text-base">📈</span>
+    ),
+  },
 ];
 
 function Sidebar({ onClose }: { onClose?: () => void }) {

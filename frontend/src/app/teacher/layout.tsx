@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { label: "Dashboard", href: "/teacher/dashboard", emoji: "🏠" },
   { label: "Training Library", href: "/teacher/training", emoji: "🎓" },
   { label: "My Submissions", href: "/teacher/assignments", emoji: "📋" },
+  { label: "My Progress", href: "/teacher/analytics", emoji: "📈" },
 ];
 
 export default function TeacherLayout({

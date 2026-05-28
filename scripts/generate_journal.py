@@ -945,13 +945,60 @@ add_bullet(doc, 'AI evaluation quality validated by at least 2 senior academic s
 
 
 # ─────────────────────────────────────────────
+# SECTION 14: PHASE 1 — BASE SETUP & DATABASE LOGIC
+# ─────────────────────────────────────────────
+
+doc.add_page_break()
+add_heading(doc, '14. Phase 1 — Base Setup & Database Architecture (CTO Journal)', level=1, color='4F46E5')
+add_divider(doc)
+
+add_paragraph(doc, (
+    'Phase 1 focuses on building the underlying infrastructure. The core structures initialized '
+    'in this phase are outlined below, providing the technical basis for the next development cycles.'
+))
+
+add_heading(doc, '14.1 Database Connection Pooling and Transaction Lifecycle', level=2)
+add_paragraph(doc, (
+    'We use PgBouncer configured in Transaction Mode as a sidecar proxy. Transactions are committed '
+    'or rolled back atomically at the end of each request lifecycle. The FastAPI async database session lifecycle '
+    'is managed cleanly via dependency injection.'
+))
+
+add_code_block(doc, '''[FastAPI Request Router]
+       │  (Acquires session from get_db dependency)
+       ▼
+[SQLAlchemy AsyncSession]
+       │  (Uses PgBouncer on port 6432)
+       ├─► Transaction BEGIN
+       ├─► Execute Queries (SELECT, INSERT, UPDATE)
+       ├─► Request Success?
+       │        YES ──► Transaction COMMIT
+       │        NO   ──► Transaction ROLLBACK
+       ▼
+[Close Session] (Releases connection back to pool)''')
+
+add_heading(doc, '14.2 Database Table Definitions & Schema Configuration', level=2)
+add_paragraph(doc, (
+    'All SQLAlchemy models utilize modern declarative 2.0 mappings. Alembic migrations are set up '
+    'to run asynchronously (using asyncpg) to create the relational schema, including indexes for: '
+    'institution_id isolation, email searches, and submissions history ordering.'
+))
+
+add_heading(doc, '14.3 Local Development Docker Compose Environment', level=2)
+add_paragraph(doc, (
+    'The local orchestration defines three containers: db (Postgres + pgvector), pgbouncer (transaction-pooler), '
+    'and redis (caching and task queue broker). Health checks are configured to block dependent services until the '
+    'dependencies are fully responsive.'
+))
+
+# ─────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────
 
 doc.add_page_break()
 end_p = doc.add_paragraph()
 end_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-end_run = end_p.add_run('— END OF PHASE 0 BLUEPRINT —')
+end_run = end_p.add_run('— END OF PLATFORM ARCHITECTURE JOURNAL —')
 end_run.bold = True
 end_run.font.size = Pt(13)
 end_run.font.color.rgb = RGBColor(0x4F, 0x46, 0xE5)
@@ -968,8 +1015,9 @@ note_p.add_run(
 # SAVE
 # ─────────────────────────────────────────────
 
-output_path = r'c:\Users\Devansh\Desktop\Projects\EduSupervision\docs\EduSupervision_Phase0_CTO_Journal.docx'
+output_path = r'c:\Users\Devansh\Desktop\Projects\EduSupervision\docs\EduSupervision_CTO_Journal.docx'
 import os
 os.makedirs(os.path.dirname(output_path), exist_ok=True)
 doc.save(output_path)
 print(f"SUCCESS: Document saved to {output_path}")
+

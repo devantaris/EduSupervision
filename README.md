@@ -64,6 +64,7 @@ Complete system design blueprint covering:
 | Phase | Status |
 |---|---|
 | Phase 0 — Architecture & Planning | ✅ Complete |
+| Phase 0.5 — 3-Agent Tech Stack Review (2 cycles) | ✅ Complete → [`FINAL_TECH_STACK.md`](docs/FINAL_TECH_STACK.md) |
 | Phase 1 — Base Setup & Auth | 🔜 Next |
 | Phase 2 — Admin & Content Management | ⏳ Pending |
 | Phase 3 — AI Evaluation Engine | ⏳ Pending |

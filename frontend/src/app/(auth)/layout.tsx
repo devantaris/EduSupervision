@@ -13,23 +13,23 @@ export default function AuthLayout({
           LEFT BRAND DOSSIER PANEL (DESKTOP)
       ══════════════════════════════════════════ */}
       <aside className="hidden lg:flex lg:w-[45%] xl:w-[42%] relative flex-col justify-between overflow-hidden border-hairline-r">
-        {/* Deep copper/amber organic backdrops */}
+        {/* Deep sapphire-navy / amber organic backdrops */}
         <div aria-hidden="true" className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#100b09] via-background to-[#17110c]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#05080f] via-background to-[#13110d]" />
           <div
-            className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-15 animate-drift-organic blur-[100px]"
-            style={{
-              background: "radial-gradient(circle, var(--accent-amber) 0%, var(--accent-copper) 60%, transparent 100%)",
-            }}
-          />
-          <div
-            className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full opacity-10 animate-drift-organic-slow blur-[80px]"
+            className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-[0.08] animate-drift-organic blur-[100px]"
             style={{
               background: "radial-gradient(circle, var(--accent-copper) 0%, transparent 70%)",
             }}
           />
+          <div
+            className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full opacity-[0.06] animate-drift-organic-slow blur-[80px]"
+            style={{
+              background: "radial-gradient(circle, var(--accent-amber) 0%, transparent 70%)",
+            }}
+          />
           {/* Fine structural grid lines */}
-          <div className="absolute inset-0 opacity-[0.025] bg-[linear-gradient(to_right,var(--accent-gold)_1px,transparent_1px),linear-gradient(to_bottom,var(--accent-gold)_1px,transparent_1px)] bg-[size:30px_30px]" />
+          <div className="absolute inset-0 opacity-[0.02] bg-[linear-gradient(to_right,var(--accent-gold)_1px,transparent_1px),linear-gradient(to_bottom,var(--accent-gold)_1px,transparent_1px)] bg-[size:30px_30px]" />
         </div>
 
         {/* Content */}
@@ -37,7 +37,7 @@ export default function AuthLayout({
           
           {/* Top Header Logo */}
           <Link href="/" className="inline-flex items-center gap-2.5 group">
-            <span className="font-serif text-xl tracking-widest font-black uppercase text-gold group-hover:text-white transition-colors duration-300">
+            <span className="font-serif-display text-xl tracking-widest font-black uppercase text-gold group-hover:text-white transition-colors duration-300">
               EduSupervision
             </span>
           </Link>
@@ -45,20 +45,20 @@ export default function AuthLayout({
           {/* Center Brand Dossier */}
           <div className="space-y-10 my-auto">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 border-hairline bg-amber-950/20 rounded px-2.5 py-1 text-[9px] tracking-widest uppercase text-gold animate-float-elastic">
-                <span className="h-1 w-1 rounded-full bg-flame animate-pulse" />
-                Enterprise Sec-Bound
+              <div className="inline-flex items-center gap-2 border-hairline bg-amber-950/10 rounded px-2.5 py-1 text-[9px] tracking-widest uppercase text-gold animate-float-elastic">
+                <span className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse" />
+                Ministerial Credentialing
               </div>
 
               <h2 className="font-serif text-3xl xl:text-4xl font-black uppercase tracking-tight leading-[1.05] text-white">
                 Rethinking <br />
-                <span className="gradient-text-flame font-sans font-extrabold normal-case tracking-tight">Educational Quality</span> <br />
+                <span className="gradient-text-flame font-sans font-extrabold normal-case tracking-tight">Academic Supervision</span> <br />
                 As a Core Metric.
               </h2>
 
               <p className="text-slate-400 text-xs xl:text-sm font-light leading-relaxed max-w-sm">
-                Statistical dashboards, immutable vector indices, and high-frequency video telemetry. 
-                Purpose-built infrastructure for modern school districts.
+                Statistical records, immutable vector indexes, and high-frequency content telemetry. 
+                Purpose-built infrastructure for modern state supervision.
               </p>
             </div>
 
@@ -104,7 +104,7 @@ export default function AuthLayout({
       <main className="flex-1 flex items-center justify-center p-6 sm:p-12 relative bg-background">
         
         {/* Subtle dot overlay */}
-        <div aria-hidden="true" className="absolute inset-0 opacity-[0.015] bg-[radial-gradient(var(--accent-gold)_1px,transparent_0)] bg-[size:24px_24px]" />
+        <div aria-hidden="true" className="absolute inset-0 opacity-[0.01] bg-[radial-gradient(var(--accent-gold)_1px,transparent_0)] bg-[size:24px_24px]" />
         
         {/* Background glow orb */}
         <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-950/5 rounded-full blur-[100px] pointer-events-none" />
@@ -114,7 +114,7 @@ export default function AuthLayout({
           {/* Mobile-only logo header */}
           <div className="lg:hidden text-center mb-10 space-y-2">
             <Link href="/" className="inline-flex items-center gap-2">
-              <span className="font-serif text-2xl tracking-widest font-black uppercase text-gold">
+              <span className="font-serif-display text-2xl tracking-widest font-black uppercase text-gold">
                 EduSupervision
               </span>
             </Link>

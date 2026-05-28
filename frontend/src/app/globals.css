@@ -7,20 +7,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 /* ─────────────────────────────────────────────
-   Design System Tokens (Atelier Theme)
+   Design System Tokens (Academic Registry Theme)
    ───────────────────────────────────────────── */
 :root {
-  --background: #09090b;        /* Warm ink black */
-  --foreground: #f4f4f5;        /* Chalk white */
-  --accent-orange: #ff453a;     /* Flame */
-  --accent-orange-rgb: 255, 69, 58;
-  --accent-gold: #e6c89c;       /* Sand gold */
-  --accent-gold-rgb: 230, 200, 156;
-  --accent-copper: #3b2314;     /* Deep copper */
-  --accent-amber: #251c10;      /* Warm amber */
+  --background: #070a10;        /* Deep slate-navy black */
+  --foreground: #f5f2eb;        /* Warm parchment white */
+  --accent-orange: #991b1b;     /* Royal Burgundy */
+  --accent-orange-rgb: 153, 27, 27;
+  --accent-gold: #dfc397;       /* Champagne Brass */
+  --accent-gold-rgb: 223, 195, 151;
+  --accent-copper: #0b212d;     /* Deep Sapphire-Teal */
+  --accent-amber: #1a150c;      /* Aged Gold */
   
-  --border-hairline: rgba(230, 200, 156, 0.15); /* Sand gold hairline */
-  --border-flame: rgba(255, 69, 58, 0.2);       /* Flame hairline */
+  --border-hairline: rgba(223, 195, 151, 0.12); /* Champagne hairline */
+  --border-flame: rgba(153, 27, 27, 0.25);      /* Burgundy hairline */
 }
 
 @theme inline {
@@ -31,7 +31,8 @@
   --color-copper: var(--accent-copper);
   --color-amber: var(--accent-amber);
   
-  --font-serif: "Cinzel", "Lora", Georgia, serif;
+  --font-serif: "Lora", Georgia, serif;
+  --font-serif-display: "Cinzel", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
 }
 
@@ -67,22 +68,22 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d0d0f;
+  background: #05070b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(230, 200, 156, 0.2); /* Sand gold alpha */
+  background: rgba(223, 195, 151, 0.15); /* Champagne alpha */
   border-radius: 2px;
   transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-orange); /* Flame accent on hover */
+  background: var(--accent-orange); /* Burgundy accent on hover */
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(230, 200, 156, 0.2) #0d0d0f;
+  scrollbar-color: rgba(223, 195, 151, 0.15) #05070b;
 }
 
 /* ─────────────────────────────────────────────
@@ -90,7 +91,7 @@ body {
    ───────────────────────────────────────────── */
 ::selection {
   background: var(--accent-orange);
-  color: #000000;
+  color: #ffffff;
 }
 
 /* ─────────────────────────────────────────────
@@ -114,7 +115,7 @@ body {
     135deg,
     #ffffff 0%,
     var(--accent-gold) 60%,
-    #bf9e65 100%
+    #c4a372 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -126,7 +127,7 @@ body {
   background: linear-gradient(
     135deg,
     var(--accent-orange) 0%,
-    #ff807a 50%,
+    #cc3b3b 50%,
     var(--accent-gold) 100%
   );
   -webkit-background-clip: text;
@@ -162,32 +163,32 @@ body {
    Atelier Glassmorphism
    ───────────────────────────────────────────── */
 .atelier-glass {
-  background: rgba(9, 9, 11, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(7, 10, 16, 0.7);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border: 1px solid var(--border-hairline);
 }
 
 .atelier-glass-flame {
-  background: rgba(9, 9, 11, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(7, 10, 16, 0.75);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border: 1px solid var(--border-flame);
 }
 
 /* ─────────────────────────────────────────────
    @keyframes: drift-organic
-   Organic drifting and morphing for ambient auroras
+   Highly slowed (45s) breathing morphs for state audits
    ───────────────────────────────────────────── */
 @keyframes drift-organic {
   0% {
     transform: translate(0px, 0px) scale(1) rotate(0deg);
   }
   33% {
-    transform: translate(40px, -60px) scale(1.15) rotate(120deg);
+    transform: translate(30px, -45px) scale(1.1) rotate(120deg);
   }
   66% {
-    transform: translate(-30px, 30px) scale(0.9) rotate(240deg);
+    transform: translate(-20px, 20px) scale(0.95) rotate(240deg);
   }
   100% {
     transform: translate(0px, 0px) scale(1) rotate(360deg);
@@ -195,38 +196,38 @@ body {
 }
 
 .animate-drift-organic {
-  animation: drift-organic 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: drift-organic 45s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .animate-drift-organic-slow {
-  animation: drift-organic 30s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: drift-organic 60s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 /* ─────────────────────────────────────────────
-   @keyframes: magnetic-elastic
-   Smooth elastic float for interactions
+   @keyframes: float-elastic
+   Dignified slow bobbing
    ───────────────────────────────────────────── */
 @keyframes float-elastic {
   0%, 100% {
     transform: translateY(0px) scale(1);
   }
   50% {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-6px) scale(1.01);
   }
 }
 
 .animate-float-elastic {
-  animation: float-elastic 5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  animation: float-elastic 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
 }
 
 /* ─────────────────────────────────────────────
    @keyframes: slate-reveal
-   Asymmetric mask-wipe sliding reveal on entry
+   Monumental, slow, heavy entry reveals (1.3s)
    ───────────────────────────────────────────── */
 @keyframes slate-reveal {
   0% {
     opacity: 0;
-    transform: translateY(40px) skewY(1.5deg);
+    transform: translateY(30px) skewY(1deg);
   }
   100% {
     opacity: 1;
@@ -235,42 +236,42 @@ body {
 }
 
 .animate-slate-reveal {
-  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slate-reveal 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-slate-reveal-delay-1 {
-  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+  animation: slate-reveal 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
 .animate-slate-reveal-delay-2 {
-  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  animation: slate-reveal 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
 }
 
 .animate-slate-reveal-delay-3 {
-  animation: slate-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+  animation: slate-reveal 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
 }
 
 /* ─────────────────────────────────────────────
    @keyframes: pulse-ring
-   Double layered glowing ring breathing effect
+   Slower (8s) breathing ring pulse for status logs
    ───────────────────────────────────────────── */
 @keyframes pulse-ring {
   0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0.4);
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0.35);
   }
   70% {
     transform: scale(1);
-    box-shadow: 0 0 0 10px rgba(var(--accent-orange-rgb), 0);
+    box-shadow: 0 0 0 8px rgba(var(--accent-orange-rgb), 0);
   }
   100% {
-    transform: scale(0.95);
+    transform: scale(0.96);
     box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0);
   }
 }
 
 .animate-pulse-ring {
-  animation: pulse-ring 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-ring 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* ─────────────────────────────────────────────
@@ -289,15 +290,15 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(230, 200, 156, 0.08) 50%,
+    rgba(223, 195, 151, 0.05) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
-  animation: shimmer 3s linear infinite;
+  animation: shimmer 4s linear infinite;
 }
 
 /* ─────────────────────────────────────────────
-   Focus ring override — sand gold
+   Focus ring override — champagne brass
    ───────────────────────────────────────────── */
 :focus-visible {
   outline: 1.5px solid var(--accent-gold);

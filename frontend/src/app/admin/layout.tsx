@@ -54,12 +54,12 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <aside className="w-64 shrink-0 h-screen sticky top-0 bg-[#09090b] border-hairline-r flex flex-col overflow-hidden select-none">
+    <aside className="w-64 shrink-0 h-screen sticky top-0 bg-[#070a10] border-hairline-r flex flex-col overflow-hidden select-none">
       
       {/* ── Logo / Seal ── */}
       <div className="px-6 pt-8 pb-6 border-hairline-b">
         <Link href="/admin/dashboard" className="flex flex-col gap-2" onClick={onClose}>
-          <span className="font-serif text-lg tracking-widest font-black uppercase text-gold">
+          <span className="font-serif-display text-lg tracking-widest font-black uppercase text-gold">
             EduSupervision
           </span>
           <div className="flex items-center justify-between">
@@ -88,7 +88,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
                 flex items-center gap-3 px-4 py-3 rounded border transition-all duration-300 group
                 ${
                   active
-                    ? "bg-[#14100e] text-gold border-gold/40 shadow-lg shadow-amber-950/10"
+                    ? "bg-[#140e0e] text-gold border-gold/30 shadow-lg shadow-amber-950/5"
                     : "text-slate-400 hover:text-white border-transparent hover:bg-[#121214]/50"
                 }
               `}
@@ -109,7 +109,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
       {/* ── Footer Metadata ── */}
       <div className="px-5 pb-8 pt-4 border-hairline-t space-y-4">
         {/* Institution Metadata Plate */}
-        <div className="flex items-center gap-3 px-3 py-3 border border-hairline bg-[#0d0d0f]/40 relative">
+        <div className="flex items-center gap-3 px-3 py-3 border border-hairline bg-[#0c0f16]/40 relative">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-gold/30" />
           <div className="w-8 h-8 rounded bg-gradient-to-br from-amber-950/30 to-background border border-hairline flex items-center justify-center shrink-0 text-sm">
@@ -181,7 +181,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main content viewport */}
       <div className="flex-1 flex flex-col min-w-0 relative z-10">
         {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[#09090b] border-hairline-b sticky top-0 z-30">
+        <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[#070a10] border-hairline-b sticky top-0 z-30">
           <button
             onClick={() => setMenuOpen(true)}
             className="p-2 border border-hairline bg-background text-slate-300 transition-all cursor-pointer"
@@ -191,7 +191,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="font-serif text-lg tracking-widest font-black uppercase text-gold">
+          <span className="font-serif-display text-lg tracking-widest font-black uppercase text-gold">
             EduSupervision
           </span>
           <div className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse-ring" />

@@ -50,7 +50,7 @@ export default function AdminDashboard() {
             <span className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse" />
             Live Audit Stream
           </div>
-          <h1 className="font-serif text-4xl sm:text-5xl font-black uppercase text-white tracking-tight">
+          <h1 className="font-serif-display text-4xl sm:text-5xl font-black uppercase text-white tracking-tight">
             Institutional <br />
             <span className="gradient-text-gold">Supervision Ledger</span>
           </h1>
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
             Analyze professional development standards, invite academic cohorts, and manage objective AI evaluations.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[10px] tracking-widest uppercase font-bold text-slate-500 border border-hairline px-4 py-2 bg-[#0c0c0e]/30">
+        <div className="flex items-center gap-2 text-[10px] tracking-widest uppercase font-bold text-slate-500 border border-hairline px-4 py-2 bg-[#0c0f16]/30">
           Last Synced: Just Now
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
         {METRICS.map((m) => (
           <div
             key={m.label}
-            className="border-hairline p-6 bg-[#0d0d0f]/20 relative flex flex-col justify-between group overflow-hidden min-h-[170px]"
+            className="border-hairline p-6 bg-[#0c0f16]/20 relative flex flex-col justify-between group overflow-hidden min-h-[170px]"
           >
             {/* Fine decoration */}
             <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left Action Box (col-span-4) */}
-        <div className="lg:col-span-4 border-hairline p-8 bg-[#0d0d0f]/20 relative flex flex-col justify-between">
+        <div className="lg:col-span-4 border-hairline p-8 bg-[#0c0f16]/20 relative flex flex-col justify-between">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           
           <div className="space-y-6">
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
                 <Link
                   key={action.label}
                   href={action.href}
-                  className="group flex flex-col gap-1 p-4 border border-hairline hover:border-gold/40 bg-background/50 hover:bg-[#121214]/50 transition-all duration-300"
+                  className="group flex flex-col gap-1 p-4 border border-hairline hover:border-gold/40 bg-background/50 hover:bg-[#121620]/50 transition-all duration-300"
                 >
                   <div className="flex justify-between items-center text-xs font-black tracking-widest uppercase text-slate-300 group-hover:text-gold transition-colors">
                     <span>{action.label}</span>
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Right Status Timeline (col-span-8) */}
-        <div className="lg:col-span-8 border border-hairline bg-[#0c0c0e]/30 p-8 relative flex flex-col justify-between">
+        <div className="lg:col-span-8 border border-hairline bg-[#0c0f16]/10 p-8 relative flex flex-col justify-between">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           
           <div className="space-y-8">
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
               <h2 className="font-serif text-lg font-bold text-white uppercase tracking-widest">
                 Platform Build Phase Status
               </h2>
-              <span className="inline-flex items-center gap-1.5 text-[9px] tracking-widest uppercase bg-amber-950/20 text-gold border border-gold/30 px-3 py-1 font-bold">
+              <span className="inline-flex items-center gap-1.5 text-[9px] tracking-widest uppercase bg-amber-950/10 text-gold border border-gold/30 px-3 py-1 font-bold">
                 Phase 1 Active
               </span>
             </div>

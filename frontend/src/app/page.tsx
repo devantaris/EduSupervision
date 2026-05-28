@@ -5,7 +5,7 @@ import Link from "next/link";
    Data
    ───────────────────────────────────────────────────────────── */
 const TRUST_SIGNALS = [
-  { value: "500+", label: "Educators Certified" },
+  { value: "500+", label: "Educators Provisioned" },
   { value: "98%", label: "LLM Scoring Precision" },
   { value: "SOC2", label: "Security Compliant" },
   { value: "30s", label: "Telemetry Progress Sync" },
@@ -64,36 +64,36 @@ const HOW_IT_WORKS = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans relative selection:bg-flame selection:text-black">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans relative selection:bg-flame selection:text-white">
       
       {/* ══════════════════════════════════════════
-          AMBIENT ORGANIC BACKDROPS
+          AMBIENT ORGANIC BACKDROPS (SLOW AUDIT DRIFT - 45s)
       ══════════════════════════════════════════ */}
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Amber auroral blob */}
+        {/* Sapphire-Teal auroral blob */}
         <div
-          className="absolute top-[-20%] left-[-10%] w-[900px] h-[900px] rounded-full opacity-20 animate-drift-organic blur-[130px]"
+          className="absolute top-[-25%] left-[-10%] w-[900px] h-[900px] rounded-full opacity-[0.12] animate-drift-organic blur-[130px]"
           style={{
-            background: "radial-gradient(circle, var(--accent-amber) 0%, var(--accent-copper) 50%, transparent 100%)",
+            background: "radial-gradient(circle, var(--accent-copper) 0%, #05070b 60%, transparent 100%)",
           }}
         />
-        {/* Copper auroral blob */}
+        {/* Aged Gold auroral blob */}
         <div
-          className="absolute bottom-[-10%] right-[-10%] w-[800px] h-[800px] rounded-full opacity-15 animate-drift-organic-slow blur-[140px]"
+          className="absolute bottom-[-15%] right-[-10%] w-[800px] h-[800px] rounded-full opacity-[0.08] animate-drift-organic-slow blur-[140px]"
           style={{
-            background: "radial-gradient(circle, var(--accent-copper) 0%, #17110c 60%, transparent 100%)",
+            background: "radial-gradient(circle, var(--accent-amber) 0%, transparent 70%)",
           }}
         />
-        {/* Flame core glow */}
+        {/* Burgundy core glow */}
         <div
-          className="absolute top-[30%] right-[10%] w-[500px] h-[500px] rounded-full opacity-[0.04] animate-pulse-ring blur-[90px]"
+          className="absolute top-[25%] right-[10%] w-[550px] h-[550px] rounded-full opacity-[0.06] animate-pulse-ring blur-[100px]"
           style={{
             background: "var(--accent-orange)",
           }}
         />
         
         {/* Fine Editorial Grid Lines */}
-        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,var(--accent-gold)_1px,transparent_1px),linear-gradient(to_bottom,var(--accent-gold)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        <div className="absolute inset-0 opacity-[0.02] bg-[linear-gradient(to_right,var(--accent-gold)_1px,transparent_1px),linear-gradient(to_bottom,var(--accent-gold)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
       </div>
 
       {/* ══════════════════════════════════════════
@@ -102,7 +102,7 @@ export default function Home() {
       <header className="relative z-10 px-8 py-6 border-hairline-b bg-background/20 backdrop-blur-[2px]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <span className="font-serif text-2xl tracking-widest font-black uppercase text-gold">
+            <span className="font-serif-display text-2xl tracking-widest font-black uppercase text-gold">
               EduSupervision
             </span>
           </Link>
@@ -115,7 +115,7 @@ export default function Home() {
             </Link>
             <Link
               href="/login"
-              className="px-5 py-2 bg-gradient-to-r from-flame to-[#d9382f] text-black text-xs tracking-widest uppercase font-black rounded hover:shadow-lg hover:shadow-flame/15 transition-all duration-300"
+              className="px-5 py-2 bg-gradient-to-r from-flame to-[#801414] text-white text-xs tracking-widest uppercase font-black rounded hover:shadow-lg hover:shadow-flame/15 transition-all duration-300"
             >
               Enter Console
             </Link>
@@ -134,23 +134,23 @@ export default function Home() {
           {/* Left Text Block (col-span-7) */}
           <div className="lg:col-span-7 space-y-8 animate-slate-reveal">
             
-            <div className="inline-flex items-center gap-2 border-hairline bg-amber-950/20 rounded px-3 py-1 text-[10px] tracking-widest uppercase text-gold animate-float-elastic">
+            <div className="inline-flex items-center gap-2 border-hairline bg-amber-950/10 rounded px-3 py-1 text-[10px] tracking-widest uppercase text-gold animate-float-elastic">
               <span className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse" />
-              CPD Orchestration Stack
+              State Auditing Stack
             </div>
 
-            <h1 className="font-serif text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter leading-[0.9] text-white">
+            <h1 className="font-serif-display text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter leading-[0.9] text-white">
               Pedagogy <br />
               <span className="text-gold">As A Craft.</span> <br />
               <span className="gradient-text-flame font-sans font-extrabold normal-case tracking-tight text-5xl sm:text-6xl md:text-7xl">
-                Supervised by AI.
+                Audited by State.
               </span>
             </h1>
 
             <p className="text-base text-slate-400 max-w-xl leading-relaxed font-light">
               EduSupervision replaces manual, inconsistent supervision workflows with an asynchronous, 
-              rubric-driven digital atelier. Deliver immersive training curricula, track watches via 
-              debounced progress telemetry, and auto-evaluate teachers via zero-bias LLM pipelines.
+              rubric-driven digital dossier. Deliver immersive training curricula, track watches via 
+              debounced progress telemetry, and auto-evaluate teachers via zero-bias, Ministry-calibrated pipelines.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -164,7 +164,7 @@ export default function Home() {
                 href="/admin/dashboard"
                 className="inline-flex items-center justify-center px-8 py-4 border-hairline hover:bg-gold/5 text-gold tracking-widest uppercase font-black text-xs transition-all duration-300"
               >
-                Institution Console
+                Ministry Console
               </Link>
             </div>
           </div>
@@ -177,37 +177,37 @@ export default function Home() {
               <div aria-hidden="true" className="absolute border border-gold/15 rounded-full w-80 h-80 sm:w-96 sm:h-96 animate-rotate-slow" />
               
               {/* Off-axis Architectural Glass Monolith */}
-              <div className="w-64 h-80 sm:w-72 sm:h-96 transform rotate-6 border border-hairline bg-gradient-to-b from-amber-950/20 to-zinc-950/40 backdrop-blur-xl p-8 flex flex-col justify-between shadow-2xl relative group overflow-hidden">
+              <div className="w-64 h-80 sm:w-72 sm:h-96 transform rotate-6 border border-hairline bg-gradient-to-b from-[#0f1422]/20 to-zinc-950/40 backdrop-blur-xl p-8 flex flex-col justify-between shadow-2xl relative group overflow-hidden">
                 {/* Micro-glow highlights */}
                 <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-50" />
                 <div className="absolute bottom-0 right-0 w-24 h-24 rounded-full bg-flame/10 blur-xl group-hover:bg-flame/20 transition-all duration-300" />
                 
                 {/* Monolith header */}
                 <div className="space-y-1">
-                  <div className="text-[9px] uppercase tracking-widest text-gold font-bold">Evaluation Engine</div>
+                  <div className="text-[9px] uppercase tracking-widest text-gold font-bold">State Ledger Core</div>
                   <div className="font-serif text-xl font-bold uppercase text-white">System: active</div>
                 </div>
 
                 {/* Monolith visual graphic */}
                 <div className="my-6 space-y-2 border-t border-b border-hairline py-4">
                   <div className="flex justify-between items-center text-[10px] tracking-widest uppercase text-slate-500">
-                    <span>Plagiarism Search</span>
-                    <span className="text-flame font-bold">HNSW Index</span>
+                    <span>Registry Search</span>
+                    <span className="text-flame font-bold">National Vault</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] tracking-widest uppercase text-slate-500">
-                    <span>Dimension Matrix</span>
-                    <span className="text-white font-bold">768 Float32</span>
+                    <span>Verification Chain</span>
+                    <span className="text-white font-bold">768-Dim Dense</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] tracking-widest uppercase text-slate-500">
-                    <span>OCR Parser</span>
-                    <span className="text-white">PyMuPDF</span>
+                    <span>Telemetry Ingestion</span>
+                    <span className="text-white">Active</span>
                   </div>
                 </div>
 
                 {/* Monolith Footer */}
                 <div className="flex items-center gap-3">
                   <div className="h-2.5 w-2.5 rounded-full bg-flame animate-pulse-ring" />
-                  <span className="text-[10px] tracking-widest uppercase font-bold text-slate-300">Evaluating 1.5s</span>
+                  <span className="text-[10px] tracking-widest uppercase font-bold text-slate-300">Auditing 1.5s</span>
                 </div>
               </div>
             </div>
@@ -215,7 +215,7 @@ export default function Home() {
         </section>
 
         {/* ── EDITORIAL TRUST BAR ── */}
-        <section className="border-hairline-t border-hairline-b bg-[#0c0c0e]/40 py-12">
+        <section className="border-hairline-t border-hairline-b bg-[#090b10]/40 py-12">
           <div className="max-w-7xl mx-auto px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {TRUST_SIGNALS.map((s, idx) => (
@@ -260,7 +260,7 @@ export default function Home() {
             {FEATURES.map((f) => (
               <article
                 key={f.title}
-                className="group p-8 border-hairline bg-[#0d0d0f]/20 hover:bg-[#121215]/30 hover:border-gold/30 transition-all duration-500 relative flex flex-col justify-between min-h-[260px]"
+                className="group p-8 border-hairline bg-[#0d0f15]/20 hover:bg-[#121620]/30 hover:border-gold/30 transition-all duration-500 relative flex flex-col justify-between min-h-[260px]"
               >
                 <div className="space-y-4">
                   {/* Raw numbering */}
@@ -287,7 +287,7 @@ export default function Home() {
         </section>
 
         {/* ── HOW IT WORKS SECTION (MAGAZINE SPREAD) ── */}
-        <section id="how-it-works" className="border-hairline-t bg-[#0c0c0e]/30 py-32 px-8">
+        <section id="how-it-works" className="border-hairline-t bg-[#090b10]/30 py-32 px-8">
           <div className="max-w-7xl mx-auto space-y-20">
             
             {/* Header */}
@@ -325,7 +325,7 @@ export default function Home() {
 
         {/* ── THE EDITORIAL CTA BANNER ── */}
         <section className="max-w-7xl mx-auto px-8 py-32">
-          <div className="border border-flame/25 bg-gradient-to-br from-[#120d0c]/40 to-background rounded p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+          <div className="border border-flame/25 bg-gradient-to-br from-[#1b0d0c]/40 to-background rounded p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
             {/* Ambient orange highlight */}
             <div aria-hidden="true" className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-flame/5 blur-[80px] pointer-events-none" />
             <div aria-hidden="true" className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-gold/5 blur-[80px] pointer-events-none" />
@@ -343,7 +343,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <Link
                   href="/login"
-                  className="px-8 py-4 bg-flame hover:bg-[#ff5d54] text-black text-xs tracking-widest uppercase font-black transition-all duration-300"
+                  className="px-8 py-4 bg-flame hover:bg-[#b01e1e] text-white text-xs tracking-widest uppercase font-black transition-all duration-300"
                 >
                   Deploy Portal Now
                 </Link>
@@ -378,7 +378,7 @@ export default function Home() {
           <span className="text-[8px] uppercase tracking-wider scale-90 opacity-0 group-hover:opacity-100 transition-opacity">Pillars</span>
         </a>
         <div aria-hidden="true" className="w-[1px] h-4 bg-gold/15" />
-        <Link href="/login" className="px-4 py-1.5 bg-gradient-to-r from-flame to-[#d9382f] text-black text-[9px] tracking-widest uppercase font-black rounded-full hover:shadow-lg hover:shadow-flame/20 hover:scale-105 transition-all duration-200">
+        <Link href="/login" className="px-4 py-1.5 bg-gradient-to-r from-flame to-[#801414] text-white text-[9px] tracking-widest uppercase font-black rounded-full hover:shadow-lg hover:shadow-flame/20 hover:scale-105 transition-all duration-200">
           Access Console
         </Link>
       </nav>
@@ -386,10 +386,10 @@ export default function Home() {
       {/* ══════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════ */}
-      <footer className="border-hairline-t bg-[#070708] py-16 px-8 relative z-10">
+      <footer className="border-hairline-t bg-[#04060b] py-16 px-8 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <span className="font-serif text-sm tracking-widest font-black uppercase text-gold">EduSupervision</span>
+            <span className="font-serif-display text-sm tracking-widest font-black uppercase text-gold">EduSupervision</span>
           </div>
           
           <div className="flex items-center gap-8 text-[10px] tracking-widest uppercase font-bold text-slate-500">

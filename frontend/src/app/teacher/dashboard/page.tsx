@@ -43,10 +43,10 @@ const MOTIVATIONAL_QUOTES = [
 
 function urgencyStyles(daysLeft: number): string {
   if (daysLeft <= 3)
-    return "text-red-400 bg-[#1e0a0a] border-red-900/40";
+    return "text-red-400 bg-[#150a0a] border-red-950/40";
   if (daysLeft <= 7)
-    return "text-amber-400 bg-[#251b10] border-amber-900/40";
-  return "text-emerald-400 bg-[#091a13] border-emerald-900/40";
+    return "text-amber-400 bg-[#1e150c] border-amber-950/40";
+  return "text-emerald-400 bg-[#081711] border-emerald-950/40";
 }
 
 function urgencyLabel(daysLeft: number): string {
@@ -63,7 +63,7 @@ export default function TeacherDashboard() {
       
       {/* ── Hero Greeting (Editorial) ── */}
       <section className="border-hairline-b pb-8 space-y-3">
-        <div className="inline-flex items-center gap-2 border border-gold/30 bg-amber-950/20 rounded px-2.5 py-0.5 text-[9px] tracking-widest uppercase text-gold animate-float-elastic">
+        <div className="inline-flex items-center gap-2 border border-gold/30 bg-amber-950/10 rounded px-2.5 py-0.5 text-[9px] tracking-widest uppercase text-gold animate-float-elastic">
           <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse" />
           Professional Development
         </div>
@@ -80,7 +80,7 @@ export default function TeacherDashboard() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Progress Plate */}
-        <article className="border-hairline p-6 bg-[#0d0d0f]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
+        <article className="border-hairline p-6 bg-[#0c0f16]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="flex items-center justify-between">
             <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
@@ -92,7 +92,7 @@ export default function TeacherDashboard() {
             <div className="flex items-baseline gap-2">
               <span className="font-serif text-5xl font-black text-white tracking-tighter">0%</span>
             </div>
-            {/* Elegant Sand progress bar */}
+            {/* Elegant Champagne progress bar */}
             <div className="w-full h-1 bg-zinc-900 overflow-hidden rounded">
               <div
                 className="h-full bg-gradient-to-r from-gold to-flame transition-all duration-700"
@@ -104,7 +104,7 @@ export default function TeacherDashboard() {
         </article>
 
         {/* Pending Submissions Plate */}
-        <article className="border-hairline p-6 bg-[#0d0d0f]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
+        <article className="border-hairline p-6 bg-[#0c0f16]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="flex items-center justify-between">
             <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
@@ -128,7 +128,7 @@ export default function TeacherDashboard() {
         </article>
 
         {/* Evaluation Score Plate */}
-        <article className="border-hairline p-6 bg-[#0d0d0f]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
+        <article className="border-hairline p-6 bg-[#0c0f16]/20 relative flex flex-col justify-between group overflow-hidden min-h-[160px]">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="flex items-center justify-between">
             <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
@@ -151,7 +151,7 @@ export default function TeacherDashboard() {
       </section>
 
       {/* ── Asymmetrical CPD Stage Timeline ── */}
-      <section className="border border-hairline p-8 bg-[#0c0c0e]/30 relative flex flex-col gap-6">
+      <section className="border border-hairline p-8 bg-[#0c0f16]/10 relative flex flex-col gap-6">
         <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
         <div className="flex items-center justify-between border-hairline-b pb-4">
           <div>
@@ -160,7 +160,7 @@ export default function TeacherDashboard() {
               District Certifications Sequence
             </p>
           </div>
-          <span className="text-[9px] tracking-widest uppercase bg-amber-950/20 text-gold border border-gold/30 px-3 py-1 font-bold">
+          <span className="text-[9px] tracking-widest uppercase bg-amber-950/10 text-gold border border-gold/30 px-3 py-1 font-bold">
             Stage 1 of 4
           </span>
         </div>
@@ -171,7 +171,7 @@ export default function TeacherDashboard() {
             <div
               key={stage.label}
               className={`p-4 border relative flex flex-col justify-between group min-h-[110px]
-                ${stage.active ? 'border-gold bg-[#14100e] text-gold' : 'border-hairline bg-[#0d0d0f]/20 opacity-50'}
+                ${stage.active ? 'border-gold bg-[#140f0e] text-gold' : 'border-hairline bg-[#0c0f16]/20 opacity-50'}
               `}
             >
               <div className="flex justify-between items-start">
@@ -200,7 +200,7 @@ export default function TeacherDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Deadlines Feed (col-span-8) */}
-        <section className="lg:col-span-8 border-hairline p-8 bg-[#0d0d0f]/20 relative flex flex-col gap-6">
+        <section className="lg:col-span-8 border-hairline p-8 bg-[#0c0f16]/20 relative flex flex-col gap-6">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
           <div className="flex items-center justify-between border-hairline-b pb-4">
             <h2 className="font-serif text-lg font-bold text-white uppercase tracking-widest">
@@ -218,7 +218,7 @@ export default function TeacherDashboard() {
             {UPCOMING_DEADLINES.map((deadline) => (
               <div
                 key={deadline.id}
-                className="flex items-center justify-between p-4 border border-hairline bg-background/50 hover:bg-[#121214]/50 transition-all duration-300 group"
+                className="flex items-center justify-between p-4 border border-hairline bg-background/50 hover:bg-[#121620]/50 transition-all duration-300 group"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-8 rounded border border-hairline bg-background flex items-center justify-center shrink-0 text-sm">
@@ -244,7 +244,7 @@ export default function TeacherDashboard() {
 
         {/* Continue Learning Action (col-span-4) */}
         <section className="lg:col-span-4 flex flex-col">
-          <div className="flex-1 border border-hairline bg-[#0d0d0f]/20 p-8 flex flex-col justify-between min-h-[220px] relative">
+          <div className="flex-1 border border-hairline bg-[#0c0f16]/20 p-8 flex flex-col justify-between min-h-[220px] relative">
             <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
             
             <div className="space-y-4">
@@ -268,7 +268,7 @@ export default function TeacherDashboard() {
       </div>
 
       {/* ── Inspiration Quote (Editorial Panel) ── */}
-      <section className="border border-hairline p-8 bg-[#0d0d0f]/20 relative overflow-hidden">
+      <section className="border border-hairline p-8 bg-[#0c0f16]/20 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
         
         {/* Subtle background glow */}

@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: pgvector/pgvector:pg16
+    pull_policy: missing
     container_name: edusupervision_db
     environment:
       POSTGRES_DB: edusupervision
@@ -19,7 +20,8 @@ services:
       retries: 5
 
   pgbouncer:
-    image: edoburu/pgbouncer:1.22.0
+    image: edoburu/pgbouncer:latest
+    pull_policy: missing
     container_name: edusupervision_pgbouncer
     environment:
       - DB_HOST=db
@@ -34,19 +36,21 @@ services:
       - RESERVE_POOL_SIZE=5
       - STATS_USERS=postgres
       - ADMIN_USERS=postgres
+      - AUTH_TYPE=scram-sha-256
     ports:
-      - "6432:6432"
+      - "6432:5432"
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h localhost -p 6432 -U postgres -d edusupervision"]
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U postgres -d edusupervision"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7.2-alpine
+    pull_policy: missing
     container_name: edusupervision_redis
     ports:
       - "6379:6379"

@@ -333,3 +333,45 @@ stateDiagram-v2
 1.  **Strict JSON Output Scheme:** We configure `responseMimeType="application/json"` with exact schema parameters, forcing Gemini to return a structured JSON evaluation matching our domain models.
 2.  **Deterministic Evaluation Retries:** In the rare event of a schema mismatch, the fallback handler retries with the larger `Gemini 1.5 Pro` model at `temperature=0.0` (fully deterministic).
 3.  **Semantic Plagiarism Flagging:** We calculate similarity strictly within matching assignments of the same institution. If `similarity_score >= 0.85`, the evaluation is flagged for human administrative review.
+
+---
+
+## 8. Phase 5: Redesign & "The Academic Registry" System Design
+
+To accommodate the professional demands of a mature educator workforce and the high standards of Ministry of Education supervisors (government auditors), Phase 5 implements a visual pivot from a creative studio aesthetic into **"The Academic Registry"**—an authoritative design system inspired by traditional university archives, diplomatic documents, and state credentials.
+
+### 8.1 Color System Calibration (Dignified & Highly Readable)
+
+We overhaled the theme variables in the globals stylesheet to establish visual gravity and scholastic pedigree:
+
+*   **Background (Scholastic Ink):** Mapped to `#070a10` (Deep slate-navy black), conveying absolute systemic stability and institutional security.
+*   **Primary Accent (Royal Burgundy):** Mapped to `#991b1b` (Burgundy/Crimson), representing administrative authority, official certification, and scholarly history.
+*   **Secondary Accent (Brushed Brass):** Mapped to `#dfc397` (Champagne Brass) for high-impact typography numbers and active markers.
+*   **Base Text (Warm Parchment):** Mapped to `#f5f2eb` (Chalky parchment white) to soften screen glare and mimic physical printed paper.
+
+### 8.2 Chronological Transition Tuning (Monumental & Steady)
+
+To maintain structural dignity, the animation curves were tuned to be deliberate and architectural:
+
+*   **Monumental Entry Reveals (`slate-reveal`):** Slowed to **1.3 seconds** with high-damping Bezier keyframes (`cubic-bezier(0.16, 1, 0.3, 1)`), making dashboard modules slide into place with architectural weight.
+*   **Scholastic Glow (`drift-organic`):** Slowed background gradient drifting to a **45-second cycle**, creating a highly stable, breathing environment that eliminates reading distractions.
+*   **Diplomatic Beacons (`pulse-ring`):** Glowing active indicators are set to an elongated **8-second breathing loop**.
+
+### 8.3 Asymmetrical Layout Archetypes
+
+We overhaled the route layouts to represent data high-density and editorial layouts:
+
+```
+[The Asymmetrical Roster Grid]
+┌───────────────────────────────────────────────┬──────────────────────────────┐
+│  Primary Ledger & Submissions Dossiers        │  Supervision Actions Panel   │
+│  - Hairline sand-gold borders (1px)           │  - 72h Invite Key trigger    │
+│  - Extreme Typography Stats (text-5xl)        │  - PDF Ingestion hooks       │
+│                                               │  - State Seal Indicators     │
+│  [col-span-8]                                 │  [col-span-4]                │
+└───────────────────────────────────────────────┴──────────────────────────────┘
+```
+
+1.  **Landing Page Monolith:** Features an off-axis rotating monolith representing the **State Credentials Ledger** with nested gold rotating rings, glass structural frames, and deep slate-navy backgrounds.
+2.  **Horizontal Learning Pathways:** Replaced standard grids with asymmetrical, progress-tracked certification tracks mapping Stage 1 of 4 certification milestones (Foundation → Practice → Advanced → Expert).
+

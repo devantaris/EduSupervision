@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────
+   CSS Variables
+───────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020617; /* slate-950 */
+  --foreground: #f1f5f9; /* slate-100 */
 }
 
 @theme inline {
@@ -12,15 +15,214 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─────────────────────────────────────────────
+   Base Styles
+───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ─────────────────────────────────────────────
+   Custom Scrollbar
+───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a; /* slate-900 */
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155; /* slate-600 */
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1; /* indigo-500 */
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0f172a;
+}
+
+/* ─────────────────────────────────────────────
+   Selection
+───────────────────────────────────────────── */
+::selection {
+  background: #4f46e5; /* indigo-600 */
+  color: #ffffff;
+}
+
+/* ─────────────────────────────────────────────
+   Gradient Text Utility
+───────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    #818cf8 0%,   /* indigo-400 */
+    #c084fc 40%,  /* purple-400 */
+    #34d399 100%  /* emerald-400 */
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: float
+   Subtle vertical bobbing for hero blobs / icons
+───────────────────────────────────────────── */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: pulse-glow
+   Opacity/scale pulsing for glow blobs
+───────────────────────────────────────────── */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.08);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+/* Staggered variants */
+.animate-pulse-glow-slow {
+  animation: pulse-glow 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow-fast {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: slide-up
+   Fade + translate upward on entry
+───────────────────────────────────────────── */
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Stagger helpers */
+.animate-slide-up-delay-1 {
+  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.animate-slide-up-delay-2 {
+  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.animate-slide-up-delay-3 {
+  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: shimmer
+   Moving highlight for skeleton loaders / badges
+───────────────────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
+}
+
+/* ─────────────────────────────────────────────
+   @keyframes: rotate-slow
+   Slow rotation for decorative rings / orbs
+───────────────────────────────────────────── */
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 18s linear infinite;
+}
+
+/* ─────────────────────────────────────────────
+   Glassmorphism helper
+───────────────────────────────────────────── */
+.glass {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/* ─────────────────────────────────────────────
+   Focus ring override — use indigo
+───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
 }

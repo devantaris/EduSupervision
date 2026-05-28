@@ -12,6 +12,8 @@ from app.core.database import get_db
 from app.api.v1.auth import router as auth_router
 from app.api.v1.teachers import router as teachers_router
 from app.api.v1.materials import router as materials_router
+from app.api.v1.assignments import router as assignments_router
+from app.api.v1.submissions import router as submissions_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -27,6 +29,8 @@ os.makedirs(os.path.join(os.getcwd(), "static", "uploads"), exist_ok=True)
 app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(teachers_router, prefix=settings.API_V1_STR, tags=["teachers"])
 app.include_router(materials_router, prefix=f"{settings.API_V1_STR}/materials", tags=["materials"])
+app.include_router(assignments_router, prefix=f"{settings.API_V1_STR}/assignments", tags=["assignments"])
+app.include_router(submissions_router, prefix=f"{settings.API_V1_STR}/submissions", tags=["submissions"])
 
 # Mount static folder for local uploaded assets
 app.mount("/static", StaticFiles(directory="static"), name="static")

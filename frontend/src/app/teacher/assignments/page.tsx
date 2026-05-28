@@ -1,124 +1,129 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
-type AssignmentStatus = "pending" | "submitted" | "graded" | "overdue";
+// ─── Types ─────────────────────────────────────────────────────────────────────
+
+interface RubricCriterion {
+  id: string;
+  label: string;
+  weight: number;
+}
 
 interface Assignment {
   id: string;
   title: string;
   description: string;
-  due_at: string;
-  status: AssignmentStatus;
-  score?: number;
-  max_score?: number;
-  feedback?: string;
-  submitted_at?: string;
+  due_date: string | null;
+  max_score: number;
+  rubric_criteria: RubricCriterion[];
+  status: "active" | "closed";
 }
 
-const MOCK_ASSIGNMENTS: Assignment[] = [
-  {
-    id: "a1",
-    title: "Lesson Plan Design: Constructivist Approach",
-    description:
-      "Submit a detailed lesson plan applying constructivist pedagogy to a topic of your choice. Must include learning objectives, activities, and assessment criteria.",
-    due_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "pending",
-  },
-  {
-    id: "a2",
-    title: "Classroom Management Reflection Journal",
-    description:
-      "Write a 500-word reflective journal entry on a challenging classroom management situation you encountered and how you resolved it.",
-    due_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "submitted",
-    submitted_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "a3",
-    title: "Differentiated Instruction Analysis",
-    description:
-      "Analyze a provided case study and propose strategies for differentiating instruction for diverse learners including ELL students and students with IEPs.",
-    due_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "graded",
-    score: 88,
-    max_score: 100,
-    submitted_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    feedback:
-      "Excellent analysis of accommodation strategies. Consider expanding on technology-based differentiation tools in future submissions.",
-  },
-  {
-    id: "a4",
-    title: "Formative Assessment Design Portfolio",
-    description:
-      "Create a portfolio of 5 formative assessment strategies tailored to secondary school science curriculum.",
-    due_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "overdue",
-  },
-];
+interface Submission {
+  id: string;
+  assignment_id: string;
+  status: "pending" | "processing" | "evaluated" | "failed";
+  score_json: { overall_score?: number } | null;
+  created_at: string;
+}
 
-const STATUS_CONFIG: Record<AssignmentStatus, { label: string; badge: string; dot: string; cardBorder: string }> = {
-  pending: {
-    label: "Pending",
-    badge: "bg-amber-950/60 text-amber-400 border border-amber-900/60",
-    dot: "bg-amber-400 animate-pulse",
-    cardBorder: "border-amber-900/30 hover:border-amber-800/50",
-  },
-  submitted: {
-    label: "Submitted",
-    badge: "bg-indigo-950/60 text-indigo-400 border border-indigo-900/60",
-    dot: "bg-indigo-400",
-    cardBorder: "border-indigo-900/30 hover:border-indigo-800/50",
-  },
-  graded: {
-    label: "Graded",
-    badge: "bg-emerald-950/60 text-emerald-400 border border-emerald-900/60",
-    dot: "bg-emerald-400",
-    cardBorder: "border-emerald-900/30 hover:border-emerald-800/50",
-  },
-  overdue: {
-    label: "Overdue",
-    badge: "bg-red-950/60 text-red-400 border border-red-900/60",
-    dot: "bg-red-400",
-    cardBorder: "border-red-900/30 hover:border-red-800/50",
-  },
+// ─── Status Config ─────────────────────────────────────────────────────────────
+
+const SUBMISSION_STATUS: Record<string, { label: string; color: string; dot: string }> = {
+  pending: { label: "Queued", color: "text-amber-400", dot: "bg-amber-400" },
+  processing: { label: "AI Processing", color: "text-blue-400", dot: "bg-blue-400 animate-pulse" },
+  evaluated: { label: "Evaluated", color: "text-emerald-400", dot: "bg-emerald-500" },
+  failed: { label: "Failed", color: "text-red-400", dot: "bg-red-400" },
 };
 
-function getDueDateLabel(due_at: string, status: AssignmentStatus): { text: string; color: string } {
-  if (status === "graded" || status === "submitted") {
-    return { text: "", color: "" };
-  }
-  const diff = new Date(due_at).getTime() - Date.now();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
+// ─── Upload + Submit Component ─────────────────────────────────────────────────
 
-  if (diff < 0) return { text: `${Math.abs(days)} day${Math.abs(days) !== 1 ? "s" : ""} overdue`, color: "text-red-400" };
-  if (hours < 24) return { text: `Due in ${hours}h`, color: "text-red-400" };
-  if (days <= 2) return { text: `Due in ${days} day${days !== 1 ? "s" : ""}`, color: "text-amber-400" };
-  return { text: `Due in ${days} days`, color: "text-slate-400" };
-}
-
-function SubmitArea({ assignment, onSubmit }: { assignment: Assignment; onSubmit: (id: string) => void }) {
+function SubmitArea({
+  assignment,
+  onSubmitted,
+}: {
+  assignment: Assignment;
+  onSubmitted: (sub: Submission) => void;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [note, setNote] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+    const dropped = e.dataTransfer.files[0];
+    if (dropped) setFile(dropped);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
-    setSubmitting(true);
-    // Simulate API call delay
-    await new Promise((r) => setTimeout(r, 1200));
-    onSubmit(assignment.id);
-    setSubmitting(false);
+    setError("");
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      // Step 1: Get presigned upload URL
+      const presignRes = await apiFetch("/api/submissions/presign", {
+        method: "POST",
+        body: JSON.stringify({
+          filename: file.name,
+          content_type: file.type || "application/octet-stream",
+          assignment_id: assignment.id,
+        }),
+      });
+      if (!presignRes.ok) {
+        const err = await presignRes.json().catch(() => ({}));
+        throw new Error(err?.detail ?? "Failed to get upload URL");
+      }
+      const { upload_url, s3_key } = await presignRes.json();
+      setUploadProgress(20);
+
+      // Step 2: Upload file directly via XHR (for progress events)
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", upload_url, true);
+        xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+        xhr.upload.onprogress = (ev) => {
+          if (ev.lengthComputable) {
+            const pct = Math.round((ev.loaded / ev.total) * 70);
+            setUploadProgress(20 + pct);
+          }
+        };
+        xhr.onload = () => (xhr.status < 400 ? resolve() : reject(new Error(`Upload failed: ${xhr.status}`)));
+        xhr.onerror = () => reject(new Error("Network error during upload"));
+        xhr.send(file);
+      });
+      setUploadProgress(90);
+
+      // Step 3: Confirm submission → triggers AI pipeline
+      const confirmRes = await apiFetch("/api/submissions/confirm", {
+        method: "POST",
+        body: JSON.stringify({
+          s3_key,
+          file_mime: file.type || "application/octet-stream",
+          assignment_id: assignment.id,
+        }),
+      });
+      if (!confirmRes.ok) {
+        const err = await confirmRes.json().catch(() => ({}));
+        throw new Error(err?.detail ?? "Confirmation failed");
+      }
+      const submission: Submission = await confirmRes.json();
+      setUploadProgress(100);
+      onSubmitted(submission);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Submission failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -133,10 +138,10 @@ function SubmitArea({ assignment, onSubmit }: { assignment: Assignment; onSubmit
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-all duration-200 ${
           isDragging
-            ? "border-indigo-500 bg-indigo-950/20"
+            ? "border-[#991b1b] bg-[#991b1b]/10"
             : file
             ? "border-emerald-700 bg-emerald-950/10"
-            : "border-slate-700 hover:border-indigo-600 bg-slate-950/30 hover:bg-indigo-950/10"
+            : "border-slate-700 hover:border-[#991b1b]/50 bg-slate-950/30"
         }`}
       >
         {file ? (
@@ -148,202 +153,247 @@ function SubmitArea({ assignment, onSubmit }: { assignment: Assignment; onSubmit
             </div>
             <div>
               <p className="text-xs font-semibold text-emerald-400 truncate max-w-xs">{file.name}</p>
-              <p className="text-[10px] text-slate-500">{(file.size / (1024 * 1024)).toFixed(2)} MB — click to change</p>
+              <p className="text-[10px] text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB · click to change</p>
             </div>
           </>
         ) : (
           <>
             <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-              </svg>
+              <span className="text-base">📄</span>
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-400">Drop file here or click to browse</p>
-              <p className="text-[10px] text-slate-600">PDF, DOCX, PPTX accepted</p>
+              <p className="text-[10px] text-slate-600">PDF, DOCX accepted · max 50 MB</p>
             </div>
           </>
         )}
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.doc,.docx,.ppt,.pptx"
+          accept=".pdf,.doc,.docx"
           onChange={(e) => e.target.files?.[0] && setFile(e.target.files[0])}
           className="hidden"
         />
       </div>
 
-      {/* Optional note */}
-      <textarea
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="Add a note for your supervisor (optional)..."
-        rows={2}
-        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 placeholder:text-slate-700 text-xs focus:outline-none focus:border-indigo-500 transition-colors resize-none"
-      />
+      {/* Upload progress bar */}
+      {uploading && (
+        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full bg-[#dfc397] transition-all duration-300"
+            style={{ width: `${uploadProgress}%` }}
+          />
+        </div>
+      )}
+
+      {error && (
+        <p className="text-xs text-red-400 bg-red-950/30 border border-red-900/40 rounded-lg p-2.5">{error}</p>
+      )}
 
       <button
         type="submit"
-        disabled={!file || submitting}
+        disabled={!file || uploading}
         className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
-          !file || submitting
+          !file || uploading
             ? "bg-slate-800 text-slate-600 cursor-not-allowed"
-            : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 cursor-pointer"
+            : "bg-[#991b1b] hover:bg-[#881337] text-[#f5f2eb] shadow-lg shadow-[#991b1b]/20 cursor-pointer"
         }`}
       >
-        {submitting ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Submitting...
-          </span>
-        ) : (
-          "Submit Assignment"
-        )}
+        {uploading ? `Uploading… ${uploadProgress}%` : "Submit for AI Evaluation"}
       </button>
     </form>
   );
 }
 
+// ─── Main Page ─────────────────────────────────────────────────────────────────
+
 export default function TeacherAssignmentsPage() {
-  const [assignments, setAssignments] = useState<Assignment[]>(MOCK_ASSIGNMENTS);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [mySubmissions, setMySubmissions] = useState<Record<string, Submission>>({});
+  const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const handleSubmit = (id: string) => {
-    setAssignments((prev) =>
-      prev.map((a) =>
-        a.id === id
-          ? { ...a, status: "submitted" as AssignmentStatus, submitted_at: new Date().toISOString() }
-          : a
-      )
-    );
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [assignRes, subRes] = await Promise.all([
+        apiFetch("/api/assignments"),
+        apiFetch("/api/submissions"),
+      ]);
+
+      if (assignRes.ok) {
+        const data = await assignRes.json();
+        setAssignments(Array.isArray(data) ? data : data.assignments ?? []);
+      }
+      if (subRes.ok) {
+        const data = await subRes.json();
+        const subs: Submission[] = Array.isArray(data) ? data : data.submissions ?? [];
+        // Map by assignment_id for easy lookup
+        const subMap: Record<string, Submission> = {};
+        for (const s of subs) subMap[s.assignment_id] = s;
+        setMySubmissions(subMap);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  function handleSubmitted(submission: Submission) {
+    setMySubmissions((prev) => ({ ...prev, [submission.assignment_id]: submission }));
     setExpandedId(null);
-  };
+  }
+
+  function formatDue(due: string | null) {
+    if (!due) return "No due date";
+    const d = new Date(due);
+    const now = Date.now();
+    const diff = d.getTime() - now;
+    const days = Math.ceil(diff / 86400000);
+    if (days < 0) return `${Math.abs(days)}d overdue`;
+    if (days === 0) return "Due today";
+    return `Due in ${days} day${days !== 1 ? "s" : ""}`;
+  }
 
   const stats = {
     total: assignments.length,
-    pending: assignments.filter((a) => a.status === "pending").length,
-    submitted: assignments.filter((a) => a.status === "submitted").length,
-    graded: assignments.filter((a) => a.status === "graded").length,
-    overdue: assignments.filter((a) => a.status === "overdue").length,
+    pending: assignments.filter((a) => !mySubmissions[a.id]).length,
+    submitted: Object.keys(mySubmissions).length,
+    evaluated: Object.values(mySubmissions).filter((s) => s.status === "evaluated").length,
   };
 
   return (
     <div className="space-y-8 max-w-4xl">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100">My Submissions</h1>
-        <p className="text-slate-400 text-sm mt-1">
-          Submit lesson plans and view detailed AI evaluations mapping rubric categories and development suggestions.
+      <header>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-[#f5f2eb]">My Assignments</h1>
+        <p className="text-slate-500 text-sm mt-1">
+          Submit your work and view detailed AI evaluations across all rubric criteria.
         </p>
-      </div>
+      </header>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total", value: stats.total, color: "text-slate-300", bg: "bg-slate-800/50 border-slate-700/50" },
-          { label: "Pending", value: stats.pending, color: "text-amber-400", bg: "bg-amber-950/30 border-amber-900/40" },
-          { label: "Submitted", value: stats.submitted, color: "text-indigo-400", bg: "bg-indigo-950/30 border-indigo-900/40" },
-          { label: "Graded", value: stats.graded, color: "text-emerald-400", bg: "bg-emerald-950/30 border-emerald-900/40" },
+          { label: "Total", value: stats.total, color: "text-[#dfc397]" },
+          { label: "Pending", value: stats.pending, color: "text-amber-400" },
+          { label: "Submitted", value: stats.submitted, color: "text-blue-400" },
+          { label: "Evaluated", value: stats.evaluated, color: "text-emerald-400" },
         ].map((s) => (
-          <div key={s.label} className={`rounded-2xl border p-4 shadow-lg ${s.bg}`}>
-            <div className={`text-4xl font-black ${s.color}`}>{s.value}</div>
-            <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">{s.label}</div>
+          <div key={s.label} className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4">
+            <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mt-1">{s.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Assignment Cards */}
-      {assignments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center bg-slate-900/40 border border-slate-800 rounded-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-            </svg>
-          </div>
-          <p className="text-slate-300 font-bold text-sm">No assignments assigned yet</p>
-          <p className="text-slate-600 text-xs mt-1">Your administrator will assign submissions tasks soon.</p>
+      {/* Cards */}
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-slate-900/30 border border-slate-800/60 rounded-2xl p-5 animate-pulse space-y-3">
+              <div className="h-4 bg-slate-800 rounded w-3/5" />
+              <div className="h-3 bg-slate-800/70 rounded w-full" />
+              <div className="h-3 bg-slate-800/70 rounded w-4/5" />
+            </div>
+          ))}
+        </div>
+      ) : assignments.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-slate-900/40 border border-slate-800/60 rounded-2xl">
+          <span className="text-4xl opacity-20 mb-4">📋</span>
+          <p className="text-slate-400 font-bold text-sm">No assignments yet</p>
+          <p className="text-slate-600 text-xs mt-1">Your administrator will assign tasks soon.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {assignments.map((a) => {
-            const cfg = STATUS_CONFIG[a.status];
-            const dueMeta = getDueDateLabel(a.due_at, a.status);
+            const mySub = mySubmissions[a.id];
+            const hasSubmitted = !!mySub;
+            const isEvaluated = mySub?.status === "evaluated";
             const isExpanded = expandedId === a.id;
-            const canSubmit = a.status === "pending" || a.status === "overdue";
+            const canSubmit = !hasSubmitted && a.status === "active";
+            const dueColor =
+              a.due_date && new Date(a.due_date).getTime() < Date.now()
+                ? "text-red-400"
+                : a.due_date &&
+                  new Date(a.due_date).getTime() - Date.now() < 3 * 86400000
+                ? "text-amber-400"
+                : "text-slate-500";
 
             return (
               <article
                 key={a.id}
-                className={`bg-slate-900/40 border rounded-2xl shadow-lg overflow-hidden transition-all duration-200 hover:shadow-xl ${cfg.cardBorder}`}
+                className="bg-slate-900/40 border border-slate-800/60 rounded-2xl overflow-hidden hover:border-slate-700/60 transition-all duration-200"
               >
-                {/* Card Header */}
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-2">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold ${cfg.badge}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                          {cfg.label}
-                        </span>
-                        {dueMeta.text && (
-                          <span className={`text-[10px] font-semibold ${dueMeta.color}`}>
-                            · {dueMeta.text}
-                          </span>
-                        )}
-                        {a.submitted_at && (
-                          <span className="text-[10px] text-slate-600">
-                            · Submitted {new Date(a.submitted_at).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-sm font-bold text-slate-200 leading-snug">{a.title}</h3>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-relaxed line-clamp-2">{a.description}</p>
+                      <h3 className="text-sm font-bold text-[#f5f2eb] leading-snug">{a.title}</h3>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">{a.description}</p>
                     </div>
 
-                    {/* Score (if graded) */}
-                    {a.status === "graded" && a.score !== undefined && (
+                    {isEvaluated && mySub.score_json?.overall_score != null && (
                       <div className="shrink-0 text-right">
-                        <div className="text-2xl font-black text-emerald-400">{a.score}</div>
-                        <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">/ {a.max_score ?? 100} pts</div>
+                        <div className="text-2xl font-black text-emerald-400">
+                          {mySub.score_json.overall_score.toFixed(0)}
+                        </div>
+                        <div className="text-[9px] text-slate-600 font-bold uppercase tracking-wider">/ 100 pts</div>
                       </div>
                     )}
                   </div>
 
-                  {/* Graded Feedback */}
-                  {a.status === "graded" && a.feedback && (
-                    <div className="mt-3 p-3 bg-emerald-950/20 border border-emerald-900/40 rounded-xl">
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">AI Feedback</p>
-                      <p className="text-xs text-slate-300 leading-relaxed">{a.feedback}</p>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-4 mt-4 flex-wrap">
+                    <span className={`text-[10px] font-bold ${dueColor}`}>{formatDue(a.due_date)}</span>
+                    <span className="text-[10px] text-slate-600">{a.rubric_criteria.length} rubric criteria</span>
 
-                  {/* Actions Row */}
-                  <div className="flex items-center gap-3 mt-4">
-                    <div className="text-[10px] text-slate-600">
-                      Due {new Date(a.due_at).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
-                    </div>
-                    {canSubmit && (
-                      <button
-                        onClick={() => setExpandedId(isExpanded ? null : a.id)}
-                        className={`ml-auto text-xs font-bold px-3.5 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
-                          isExpanded
-                            ? "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
-                            : "bg-indigo-600 hover:bg-indigo-500 text-white border-transparent shadow-lg shadow-indigo-500/20"
+                    {/* Submission status badge */}
+                    {mySub && (
+                      <span
+                        className={`inline-flex items-center gap-1.5 text-[10px] font-bold ${
+                          SUBMISSION_STATUS[mySub.status]?.color ?? "text-slate-400"
                         }`}
                       >
-                        {isExpanded ? "Cancel" : "Submit Work"}
-                      </button>
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            SUBMISSION_STATUS[mySub.status]?.dot ?? "bg-slate-400"
+                          }`}
+                        />
+                        {SUBMISSION_STATUS[mySub.status]?.label ?? mySub.status}
+                      </span>
                     )}
+
+                    <div className="ml-auto flex items-center gap-2">
+                      {isEvaluated && (
+                        <Link
+                          href={`/teacher/assignments/${mySub.id}`}
+                          className="text-xs text-[#dfc397] hover:text-[#f5f2eb] font-bold transition-colors"
+                        >
+                          View Results →
+                        </Link>
+                      )}
+                      {canSubmit && (
+                        <button
+                          onClick={() => setExpandedId(isExpanded ? null : a.id)}
+                          className={`text-xs font-bold px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                            isExpanded
+                              ? "bg-slate-800 text-slate-300 border-slate-700"
+                              : "bg-[#991b1b] hover:bg-[#881337] text-[#f5f2eb] border-transparent shadow-lg shadow-[#991b1b]/20"
+                          }`}
+                        >
+                          {isExpanded ? "Cancel" : "Submit Work"}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Expanded Submit Area */}
                 {isExpanded && canSubmit && (
-                  <div className="px-5 pb-5 border-t border-slate-800/60">
-                    <SubmitArea assignment={a} onSubmit={handleSubmit} />
+                  <div className="px-5 pb-5">
+                    <SubmitArea assignment={a} onSubmitted={handleSubmitted} />
                   </div>
                 )}
               </article>

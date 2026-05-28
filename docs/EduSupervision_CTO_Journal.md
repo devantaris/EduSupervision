@@ -375,3 +375,73 @@ We overhaled the route layouts to represent data high-density and editorial layo
 1.  **Landing Page Monolith:** Features an off-axis rotating monolith representing the **State Credentials Ledger** with nested gold rotating rings, glass structural frames, and deep slate-navy backgrounds.
 2.  **Horizontal Learning Pathways:** Replaced standard grids with asymmetrical, progress-tracked certification tracks mapping Stage 1 of 4 certification milestones (Foundation → Practice → Advanced → Expert).
 
+---
+
+## 9. Phase 6: AI Evaluation Engine — Submissions, Plagiarism & Rubric Scoring
+
+Phase 6 brings the platform's core intelligence online. Teachers upload professional development submissions, and a 6-stage Celery pipeline evaluates each one automatically — extracting text, generating semantic embeddings, running plagiarism detection, and producing a detailed AI rubric score using Google Gemini. Results appear on the teacher's screen in real-time through Redis pub/sub and SSE.
+
+### 9.1 New API Surface
+
+| Module | Purpose |
+|---|---|
+| `backend/app/api/v1/assignments.py` | CRUD for rubric-graded assignments (Admin creates, Teachers list) |
+| `backend/app/api/v1/submissions.py` | Presign → Upload → Confirm flow, submission list/detail with embedded evaluation |
+| `backend/app/schemas/assignments.py` | Pydantic v2 schemas for assignment, submission, and evaluation data contracts |
+
+Key design decisions:
+- `POST /submissions/confirm` returns **HTTP 202** immediately — evaluation runs fully async
+- Teachers cannot double-submit to the same assignment (idempotency guard on status field)
+- Plagiarism flags are stored in `score_json` JSONB for lightweight admin queries
+- All queries are scoped to `institution_id` — cross-institution comparison is architecturally impossible
+
+### 9.2 6-Stage Evaluation Pipeline (Celery Chain)
+
+```mermaid
+flowchart TD
+    A[Teacher confirms upload] --> B[HTTP 202 Accepted]
+    A --> C[Celery chain — queue: ai_heavy]
+
+    C --> D[Stage 1: Text Extraction]
+    D --> D1[DOCX → python-docx]
+    D --> D2[Digital PDF → PyMuPDF]
+    D --> D3[Scanned → Gemini Flash Vision OCR]
+
+    D1 & D2 & D3 --> E[Stage 2: Embedding\ntext-embedding-004 · 768-dim\nMean-pool across 8k-char chunks]
+
+    E --> F[Stage 3: Plagiarism Detection]
+    F --> F1[Layer 1: MinHash n-gram\ndatasketch · 128 permutations]
+    F --> F2[Layer 2: pgvector HNSW cosine\nthreshold 0.88 · institution-scoped]
+
+    F1 & F2 --> G[Stage 4: AI Rubric Evaluation\nDual-pass Gemini 2.0 Flash · temp=0.1]
+    G --> |score delta > 5pts| G2[Escalate to Gemini 1.5 Pro · temp=0.0]
+    G & G2 --> H[Stage 5: Store Result\nAIEvaluation DB record\nstatus → evaluated]
+    H --> I[Stage 6: Notify\nRedis pub/sub → SSE → Teacher browser]
+```
+
+### 9.3 Anti-Hallucination Safeguards
+
+1. **Dual-pass consistency check:** Two independent Flash runs at `temperature=0.1`. Any criterion delta > 5 pts triggers escalation to `gemini-1.5-pro` at `temperature=0.0`.
+2. **Evidence quote requirement:** Every rubric criterion score must include an `evidence_quote` — an exact verbatim quote from the submission text. The model literally cannot score what it cannot cite.
+3. **Human-in-the-loop on plagiarism:** AI never makes a final plagiarism decision autonomously. All flags surface in the Admin Evaluations dashboard for human review.
+
+### 9.4 Frontend Pages Added
+
+| Page | Route | Role |
+|---|---|---|
+| Teacher Assignments (live API) | `/teacher/assignments` | Fetches real assignments, XHR file upload via presigned URL, triggers AI pipeline |
+| Submission Result | `/teacher/assignments/[id]` | Animated score ring, criterion breakdown with evidence quotes, recommendations |
+| Admin Evaluations | `/admin/evaluations` | Paginated institution-wide submission table, score meters, plagiarism flag indicators |
+
+### 9.5 Development Mode Graceful Degradation
+
+When `GEMINI_API_KEY` is absent, the pipeline degrades gracefully:
+
+| Stage | Dev Behaviour |
+|---|---|
+| Text Extraction | Runs fully (PyMuPDF/python-docx work locally) |
+| Embedding | Returns 768-dim zero vector mock |
+| Plagiarism | MinHash runs; pgvector search may return empty if DB has no embeddings |
+| AI Evaluation | Returns structured mock result with "configure GEMINI_API_KEY" message |
+| Redis Notify | Silently skipped; teacher can poll `/submissions/{id}/status` as fallback |
+

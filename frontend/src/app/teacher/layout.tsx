@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { apiFetch, tokenStore } from "@/lib/api";
+import NotificationBell from "@/components/NotificationBell";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/teacher/dashboard", emoji: "🏠" },
@@ -52,6 +53,9 @@ export default function TeacherLayout({
               <span className="text-[15px] font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent tracking-tight">
                 EduSupervision
               </span>
+              <div className="ml-auto">
+                <NotificationBell />
+              </div>
             </div>
             {/* Badge */}
             <span className="ml-10 inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-indigo-950/70 text-indigo-400 border border-indigo-800/60 rounded-full w-fit">

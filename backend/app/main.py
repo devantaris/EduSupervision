@@ -15,6 +15,7 @@ from app.api.v1.materials import router as materials_router
 from app.api.v1.assignments import router as assignments_router
 from app.api.v1.submissions import router as submissions_router
 from app.api.v1.analytics import router as analytics_router
+from app.api.v1.notifications import router as notifications_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -33,6 +34,7 @@ app.include_router(materials_router, prefix=f"{settings.API_V1_STR}/materials", 
 app.include_router(assignments_router, prefix=f"{settings.API_V1_STR}/assignments", tags=["assignments"])
 app.include_router(submissions_router, prefix=f"{settings.API_V1_STR}/submissions", tags=["submissions"])
 app.include_router(analytics_router, prefix=f"{settings.API_V1_STR}/analytics", tags=["analytics"])
+app.include_router(notifications_router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
 
 # Mount static folder for local uploaded assets
 app.mount("/static", StaticFiles(directory="static"), name="static")

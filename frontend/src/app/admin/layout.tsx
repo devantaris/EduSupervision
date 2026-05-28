@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch, tokenStore } from "@/lib/api";
+import NotificationBell from "@/components/NotificationBell";
 
 const NAV_ITEMS = [
   {
@@ -208,7 +209,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span className="font-serif-display text-lg tracking-widest font-black uppercase text-gold">
             EduSupervision
           </span>
-          <div className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse-ring" />
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+            <div className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse-ring" />
+          </div>
         </header>
 
         <main className="flex-1 p-8 lg:p-12 overflow-y-auto">

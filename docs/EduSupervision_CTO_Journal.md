@@ -445,3 +445,65 @@ When `GEMINI_API_KEY` is absent, the pipeline degrades gracefully:
 | AI Evaluation | Returns structured mock result with "configure GEMINI_API_KEY" message |
 | Redis Notify | Silently skipped; teacher can poll `/submissions/{id}/status` as fallback |
 
+---
+
+## 10. Phase 7: Analytics & Performance Reporting
+
+Phase 7 transforms raw evaluation data into institutional intelligence. Administrators get a live operations dashboard with score distributions, criterion gap analysis, and CPD stage tracking. Teachers get a personal progress view with a visual certification pathway and AI-sourced improvement recommendations.
+
+### 10.1 Analytics API Endpoints
+
+| Endpoint | Access | Purpose |
+|---|---|---|
+| `GET /analytics/institution` | Admin, SuperAdmin | Full institution dashboard: KPIs, score distribution, teacher summaries, assignment summaries |
+| `GET /analytics/ministry` | SuperAdmin only | Cross-institution comparative view for Ministry supervisors |
+| `GET /analytics/teacher/me` | Teacher | Personal score trend, CPD stage, criterion breakdown, training completion |
+| `GET /analytics/teacher/{id}` | Admin, SuperAdmin | Admin view of any individual teacher's analytics |
+
+### 10.2 CPD Certification Pathway Logic
+
+```
+Foundation   → avg_score < 70 OR total_evaluated < 2
+Practice     → avg_score ≥ 70 AND total_evaluated ≥ 2
+Advanced     → avg_score ≥ 80 AND total_evaluated ≥ 3
+Expert       → avg_score ≥ 90 AND total_evaluated ≥ 5
+```
+
+The teacher's progression within their current stage (0–100%) is calculated by linear interpolation within the stage's score band. This drives the animated progress bar on the CPD pathway UI.
+
+### 10.3 Score Distribution (PostgreSQL `width_bucket`)
+
+The institution score distribution uses PostgreSQL's native `width_bucket()` function to bin scores into 10-point ranges directly in SQL — no Python post-processing required. This is faster and more scalable than loading all scores into memory.
+
+```sql
+SELECT width_bucket(ae.overall_score, 0, 100, 10) AS bucket, COUNT(*)
+FROM ai_evaluations ae
+JOIN submissions s ON ae.submission_id = s.id
+WHERE s.institution_id = :inst_id
+GROUP BY bucket ORDER BY bucket
+```
+
+### 10.4 Criterion Gap Analysis (JSONB `LATERAL` Join)
+
+Criterion-level aggregation uses a PostgreSQL `LATERAL` join to unnest the `ai_evaluations.scores` JSONB array and compute `AVG()` per criterion — this avoids a separate `criteria` table and preserves the flexible rubric schema:
+
+```sql
+SELECT c->>'criterion', AVG(CAST(c->>'score_assigned' AS FLOAT))
+FROM ai_evaluations ae
+JOIN submissions s ON ae.submission_id = s.id,
+LATERAL jsonb_array_elements(ae.scores) AS c
+WHERE s.institution_id = :inst_id
+GROUP BY criterion ORDER BY avg ASC LIMIT 5
+```
+
+### 10.5 Frontend Pages Added
+
+| Page | Route | Highlights |
+|---|---|---|
+| Admin Analytics | `/admin/analytics` | KPI cards, score histogram, criterion gap chart, CPD distribution, teacher table with search, assignment table with completion rates |
+| Teacher Progress | `/teacher/analytics` | Score trend SVG sparkline, animated CPD pathway with stage dots, criterion weakness chart, AI recommendations |
+
+### 10.6 Ministry View Architecture
+
+The `GET /analytics/ministry` endpoint is SuperAdmin-only and produces a cross-institution ranked league table — institutions sorted by average evaluation score. This is the view the Ministry of Education supervisor would use to audit comparative performance across school districts without exposing individual teacher data.
+

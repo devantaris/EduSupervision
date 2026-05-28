@@ -783,30 +783,80 @@ def task_store_result(self, previous_result: dict) -> dict:
 )
 def task_notify_completion(self, previous_result: dict) -> dict:
     """
-    Stage 6: Publish evaluation completion event to Redis channel.
-    The FastAPI SSE endpoint subscribes and pushes real-time updates to the teacher browser.
+    Stage 6: Publish evaluation completion event to Redis channels + dispatch email.
+
+    Channels published:
+      submission:{id}        → for the teacher's result page SSE stream
+      user:{teacher_id}      → for the teacher's global SSE stream
+      institution:{inst_id}  → for admin institution-wide SSE stream
+
+    Also dispatches email notification via the notifications Celery queue.
     Latency from Celery completion → teacher UI: < 100ms.
     """
     submission_id = previous_result["submission_id"]
     overall_score = previous_result.get("overall_score", 0)
     logger.info(f"[Stage 6] Broadcasting completion event for {submission_id}")
 
+    db = _get_sync_db()
     try:
-        import redis as sync_redis
+        from app.models.submission import Submission
+        from app.models.user import User
 
-        r = sync_redis.Redis.from_url(settings.REDIS_URL)
+        submission = db.query(Submission).filter(Submission.id == submission_id).first()
+        teacher_id = str(submission.teacher_id) if submission else None
+        institution_id = str(submission.institution_id) if submission else None
+
+        # Fetch teacher info for email
+        teacher = db.query(User).filter(User.id == submission.teacher_id).first() if submission else None
+        teacher_email = teacher.email if teacher else None
+        teacher_name = getattr(teacher, "full_name", None) or (teacher.email.split("@")[0] if teacher else "Teacher")
+
+        # Fetch assignment title
+        from app.models.assignment import Assignment
+        assignment = db.query(Assignment).filter(Assignment.id == submission.assignment_id).first() if submission else None
+        assignment_title = assignment.title if assignment else "Assignment"
+
         payload = json.dumps({
+            "type": "evaluation_complete",
             "submission_id": submission_id,
             "status": "evaluated",
             "overall_score": overall_score,
         })
-        channel = f"submission:{submission_id}"
-        r.publish(channel, payload)
-        logger.info(f"[Stage 6] ✅ Published to Redis channel '{channel}'")
+
+        import redis as sync_redis
+        r = sync_redis.Redis.from_url(settings.REDIS_URL)
+
+        channels_published = []
+        for channel in [
+            f"submission:{submission_id}",
+            f"user:{teacher_id}" if teacher_id else None,
+            f"institution:{institution_id}" if institution_id else None,
+        ]:
+            if channel:
+                try:
+                    r.publish(channel, payload)
+                    channels_published.append(channel)
+                except Exception as e:
+                    logger.warning(f"[Stage 6] Failed to publish to {channel}: {e}")
         r.close()
+        logger.info(f"[Stage 6] ✅ Published to {len(channels_published)} Redis channels")
+
+        # Dispatch email notification (non-critical, separate queue)
+        if teacher_email:
+            try:
+                from app.tasks.notify_evaluation import send_evaluation_email
+                send_evaluation_email.apply_async(
+                    args=[teacher_email, teacher_name, assignment_title, overall_score, submission_id],
+                    queue="notifications",
+                )
+                logger.info(f"[Stage 6] Email notification queued for {teacher_email}")
+            except Exception as e:
+                logger.warning(f"[Stage 6] Email dispatch failed (non-critical): {e}")
 
     except Exception as e:
-        logger.warning(f"[Stage 6] Redis notification failed (non-critical): {e}")
-        # Non-critical — teacher can poll /status endpoint as fallback
+        logger.warning(f"[Stage 6] Notification failed (non-critical): {e}")
+        # Non-critical — teacher can poll /submissions/{id}/status as fallback
+    finally:
+        db.close()
 
     return {"submission_id": submission_id, "notified": True}

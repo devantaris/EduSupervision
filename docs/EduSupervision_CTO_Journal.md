@@ -507,3 +507,51 @@ GROUP BY criterion ORDER BY avg ASC LIMIT 5
 
 The `GET /analytics/ministry` endpoint is SuperAdmin-only and produces a cross-institution ranked league table — institutions sorted by average evaluation score. This is the view the Ministry of Education supervisor would use to audit comparative performance across school districts without exposing individual teacher data.
 
+---
+
+## 11. Phase 8: Real-Time Notification System
+
+Phase 8 closes the feedback loop. After AI evaluation completes, teachers see results in their browser immediately — no polling, no page refresh. The system uses Redis pub/sub as the event backbone, FastAPI async SSE as the delivery mechanism, and Celery for email dispatch.
+
+### 11.1 Notification Architecture
+
+```
+Teacher Browser (EventSource)
+  └── GET /notifications/stream (FastAPI SSE)
+        ├── asyncio.Queue (in-process buffer, maxsize=100)
+        ├── background coroutine: Redis SUBSCRIBE → queue.put(payload)
+        └── generator: queue.get(timeout=30s) → yield "data:...\n\n"
+                                              ← 30s timeout → yield ": heartbeat\n\n"
+
+Celery Stage 6 (ai_heavy worker)
+  └── redis.PUBLISH to 3 channels:
+        ├── submission:{uuid}         → teacher result page
+        ├── user:{uuid}               → teacher global notification bell
+        └── institution:{uuid}        → admin institution-wide feed
+```
+
+### 11.2 Redis Channel Convention
+
+| Channel | Subscriber | Event |
+|---|---|---|
+| `submission:{uuid}` | Teacher result page | evaluation_complete |
+| `user:{uuid}` | Teacher global SSE | all personal notifications |
+| `institution:{uuid}` | Admin SSE | new evaluations, flags |
+| `institution:{uuid}:announcements` | Teacher SSE | admin announcements |
+
+### 11.3 Email Notification Task
+
+`notify_evaluation.send_evaluation_email` runs on the `notifications` Celery queue (gevent pool — lightweight I/O). This is separate from `ai_heavy` (prefork — CPU-intensive GPU/model work) so email dispatch never delays AI processing.
+
+**Dev mode:** Prints a formatted email mock to stdout — no SMTP configuration needed.
+**Production upgrade:** Replace the print block with `sendgrid.SendGridAPIClient()` or `boto3.client('ses')` — one function, no architecture changes.
+
+### 11.4 NotificationBell Component
+
+Placed in both admin and teacher layouts. Key behaviors:
+- Opens `EventSource` on mount; auto-reconnects on disconnect with 5s backoff
+- Unread count badge clears when panel is opened (`markAllRead()`)
+- Connection status dot: green = live Redis connection, missing = offline
+- Last 50 events stored in React state — no persistence needed
+- Color-coded by type: `evaluation_complete` → green, `similarity_flag` → amber, `announcement` → blue
+

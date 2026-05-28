@@ -1030,6 +1030,50 @@ add_paragraph(doc, (
 ))
 
 # ─────────────────────────────────────────────
+# SECTION 16: PHASE 3 — ACADEMIC ADMINISTRATION & ONBOARDING
+# ─────────────────────────────────────────────
+
+doc.add_page_break()
+add_heading(doc, '16. Phase 3 — Academic Administration & Teacher Onboarding (CTO Journal)', level=1, color='4F46E5')
+add_divider(doc)
+
+add_paragraph(doc, (
+    'Phase 3 establishes the tenant provisioning, user registration loops, and administrative portals. '
+    'Async tasks manage background welcome emails and secure token delivery.'
+))
+
+add_heading(doc, '16.1 Admin Invitation & Registration Verification Flow', level=2)
+add_paragraph(doc, (
+    'To coordinate bulk invites, administrators trigger an endpoint sending temporary registration tokens to educators. '
+    'The flow manages state transition from pending_verification to active.'
+))
+
+add_code_block(doc, '''[Admin Portal (Roster)]
+       │  (Invites list of email addresses)
+       ▼
+[FastAPI /teachers/invite]
+       │  (Generates 72-hour invite JWT token)
+       ▼
+[Celery Email Worker] ──► Mocks SMTP Outbound Transmission
+       │
+       ▼  (Teacher clicks activation link /register/{token})
+[Next.js Registration Page] ──► Submits password, name, employee_id
+       │
+       ▼
+[FastAPI /teachers/register/{token}]
+       ├─► Decodes & Validates token
+       ├─► Hashes password via pbkdf2_sha256
+       ├─► Updates user status = 'active'
+       └─► Inserts Profile record''')
+
+add_heading(doc, '16.2 Tenant Provisioning Scopes', level=2)
+add_paragraph(doc, (
+    'SuperAdmin provisions new organizations (POST /institutions). The provisioning inserts '
+    'the Institution record, creates the primary administrator, and schedules the administrator welcome email. '
+    'Multi-tenant constraints are permanently linked at the profile and user layers.'
+))
+
+# ─────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────
 
@@ -1058,5 +1102,6 @@ import os
 os.makedirs(os.path.dirname(output_path), exist_ok=True)
 doc.save(output_path)
 print(f"SUCCESS: Document saved to {output_path}")
+
 
 

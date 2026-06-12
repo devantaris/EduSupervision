@@ -1,7 +1,7 @@
 # EduSupervision — Complete Project Walkthrough
-## All Phases: 0 through 6
+## All Phases: 0 through 8
 
-> **Status:** Active Development · 7 phases complete · Phases 7–8 upcoming
+> **Status:** Completed · 9 phases complete (Phases 0-8)
 > 
 > *This document is the single source of truth for what has been built, how it works, and how to operate the platform.*
 
@@ -115,6 +115,32 @@ EduSupervision is an **AI-powered teacher training, evaluation, and educational 
   - Admin evaluations: institution-wide submission table, score meters, plagiarism flags
 
 **Endpoints built:** `POST/GET/DELETE /assignments`, `POST /submissions/presign`, `POST /submissions/confirm`, `GET /submissions`, `GET /submissions/{id}`, `GET /submissions/{id}/status`
+
+---
+
+### Phase 7 — Analytics & Reporting
+**What was done:**
+- Live operations dashboard for admins (score distributions, weak criteria analysis, CPD distribution)
+- Personal progress dashboard for teachers (certification pathway progress, AI recommendations, weakness highlight)
+- Built multi-tenant analytics engine aggregating KPIs (active teachers, submission counts, averages)
+- PostgreSQL native `width_bucket` optimization for score distribution histogram
+- PostgreSQL native JSONB array unnesting via `LATERAL` join for high-performance criterion gap analysis
+- Built SuperAdmin-scoped Ministry Overview route to compare/rank institutions across the system
+
+**Endpoints built:** `GET /analytics/institution`, `GET /analytics/ministry`, `GET /analytics/teacher/me`, `GET /analytics/teacher/{id}`
+
+---
+
+### Phase 8 — Real-Time Notifications & Email Sync
+**What was done:**
+- Event-driven notifications via Redis Pub/Sub backend backbone
+- FastAPI asynchronous Server-Sent Events (SSE) `/notifications/stream` connection management with 30s heartbeat
+- Dedicated async Redis subscription listener coroutine yielding events directly into client streams
+- Separated Celery worker pools: CPU-heavy evaluation runs on `ai_heavy` (prefork), I/O-heavy emails run on `notifications` (gevent)
+- Styled `NotificationBell` React component with auto-reconnect, 5s backoff, and local state buffer (50 last items)
+- Integrated real-time notifications for evaluation completes, plagiarism flags, and admin announcements
+
+**Endpoints built:** `GET /notifications/stream`, `POST /notifications/announcement`
 
 ---
 

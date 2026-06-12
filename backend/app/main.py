@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 import redis.asyncio as aioredis
 from typing import Dict, Any
+import asyncio
 
 import os
 from fastapi.staticfiles import StaticFiles
@@ -49,6 +50,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ── TEMPORARY: Remove after first successful seed ─────────────────────────────
+@app.post("/admin/seed", status_code=200, tags=["admin"])
+async def trigger_seed():
+    """
+    Temporary endpoint to seed the database. Call once then it becomes a no-op.
+    """
+    try:
+        from seed import seed_data
+        await seed_data()
+        return {"status": "ok", "message": "Database seeded successfully"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+# ── END TEMPORARY ─────────────────────────────────────────────────────────────
 
 @app.get("/health", status_code=status.HTTP_200_OK)
 async def health_check() -> Dict[str, str]:

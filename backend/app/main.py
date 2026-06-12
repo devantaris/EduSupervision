@@ -52,17 +52,29 @@ app.add_middleware(
 
 
 # ── TEMPORARY: Remove after first successful seed ─────────────────────────────
-@app.post("/admin/seed", status_code=200, tags=["admin"])
+@app.get("/admin/seed", status_code=200, tags=["admin"])
 async def trigger_seed():
     """
-    Temporary endpoint to seed the database. Call once then it becomes a no-op.
+    Temporary endpoint to seed the database. Open this URL in browser to seed.
     """
     try:
         from seed import seed_data
         await seed_data()
         return {"status": "ok", "message": "Database seeded successfully"}
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        import traceback
+        return {"status": "error", "message": str(e), "traceback": traceback.format_exc()}
+
+
+@app.get("/debug/users", status_code=200, tags=["admin"])
+async def debug_users(db: AsyncSession = Depends(get_db)):
+    """
+    Temporary: checks how many users exist in DB and lists their emails.
+    """
+    from sqlalchemy import text as sql_text
+    result = await db.execute(sql_text("SELECT email, role, status FROM users LIMIT 10"))
+    rows = result.fetchall()
+    return {"user_count": len(rows), "users": [{"email": r[0], "role": r[1], "status": r[2]} for r in rows]}
 # ── END TEMPORARY ─────────────────────────────────────────────────────────────
 
 @app.get("/health", status_code=status.HTTP_200_OK)

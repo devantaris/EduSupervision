@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { apiFetch } from "@/lib/api";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Teacher {
   id: string;
@@ -8,9 +11,12 @@ interface Teacher {
   first_name: string;
   last_name: string;
   status: "active" | "pending_verification" | "suspended";
-  employee_id: string;
-  invited_at: string;
+  employee_id: string | null;
+  invited_at?: string;
+  created_at: string;
 }
+
+// ─── Status config ────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
   active: {
@@ -36,6 +42,8 @@ const STATUS_CONFIG = {
   },
 } as const;
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
 function AvatarInitials({ teacher }: { teacher: Teacher }) {
   const cfg = STATUS_CONFIG[teacher.status];
   const initials = teacher.first_name
@@ -50,48 +58,53 @@ function AvatarInitials({ teacher }: { teacher: Teacher }) {
   );
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function AdminTeachersPage() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [inviteInput, setInviteInput] = useState("");
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteStatus, setInviteStatus] = useState<string | null>(null);
   const [inviteStep, setInviteStep] = useState<1 | 2>(1);
+  const [inviting, setInviting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const mockRoster: Teacher[] = [
-      {
-        id: "t1",
-        email: "sarah.jenkins@oakridge.edu",
-        first_name: "Sarah",
-        last_name: "Jenkins",
-        status: "active",
-        employee_id: "EMP-2024-0012",
-        invited_at: "2026-05-10T14:30:00Z",
-      },
-      {
-        id: "t2",
-        email: "robert.chen@oakridge.edu",
-        first_name: "Robert",
-        last_name: "Chen",
-        status: "active",
-        employee_id: "EMP-2024-0045",
-        invited_at: "2026-05-12T09:15:00Z",
-      },
-      {
-        id: "t3",
-        email: "elizabeth.taylor@oakridge.edu",
-        first_name: "",
-        last_name: "",
-        status: "pending_verification",
-        employee_id: "",
-        invited_at: "2026-05-28T16:00:00Z",
-      },
-    ];
-    setTeachers(mockRoster);
+  // ── Fetch roster ──
+  const fetchTeachers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch("/api/v1/teachers");
+      if (res.ok) {
+        const data = await res.json();
+        const raw: Teacher[] = (data.teachers ?? data ?? []).map((t: Record<string, unknown>) => ({
+          id: t.id as string,
+          email: t.email as string,
+          first_name: (t.first_name as string) || "",
+          last_name: (t.last_name as string) || "",
+          status: (t.status as Teacher["status"]) || "pending_verification",
+          employee_id: (t.employee_id as string | null) ?? null,
+          created_at: (t.created_at as string) || new Date().toISOString(),
+        }));
+        setTeachers(raw);
+      } else {
+        setError("Failed to load teacher roster.");
+      }
+    } catch {
+      setError("Network error. Could not reach the backend.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const handleBulkInvite = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchTeachers();
+  }, [fetchTeachers]);
+
+  // ── Invite handler ──
+  const handleBulkInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteInput.trim()) return;
 
@@ -105,46 +118,44 @@ export default function AdminTeachersPage() {
       return;
     }
 
-    const newInvites: Teacher[] = emails.map((email, idx) => ({
-      id: `new-${Date.now()}-${idx}`,
-      email,
-      first_name: "",
-      last_name: "",
-      status: "pending_verification",
-      employee_id: "",
-      invited_at: new Date().toISOString(),
-    }));
-
-    setTeachers((prev) => [...prev, ...newInvites]);
-    setInviteInput("");
-    setInviteStatus(`Success: Invitation links dispatched to ${emails.length} educator${emails.length > 1 ? "s" : ""}.`);
-    setInviteStep(2);
-
-    setTimeout(() => {
-      setInviteStatus(null);
-      setShowInviteModal(false);
-      setInviteStep(1);
-    }, 4000);
+    setInviting(true);
+    setInviteStatus(null);
+    try {
+      const res = await apiFetch("/api/v1/teachers/invite", {
+        method: "POST",
+        body: JSON.stringify({ emails }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setInviteStep(2);
+        setInviteStatus(`Success: ${data.detail ?? `Invitations dispatched to ${emails.length} educator${emails.length > 1 ? "s" : ""}.`}`);
+        setInviteInput("");
+        // Refetch roster so new pending entries appear
+        await fetchTeachers();
+        setTimeout(() => {
+          setInviteStatus(null);
+          setShowInviteModal(false);
+          setInviteStep(1);
+        }, 4000);
+      } else {
+        setInviteStatus(`Error: ${data.detail ?? "Failed to send invitations."}`);
+      }
+    } catch {
+      setInviteStatus("Error: Network error. Please try again.");
+    } finally {
+      setInviting(false);
+    }
   };
 
-  const toggleStatus = (id: string) => {
-    setTeachers((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          const nextStatus = t.status === "active" ? "suspended" : "active";
-          return { ...t, status: nextStatus };
-        }
-        return t;
-      })
-    );
-  };
-
-  const stats = useMemo(() => ({
-    total: teachers.length,
-    active: teachers.filter((t) => t.status === "active").length,
-    pending: teachers.filter((t) => t.status === "pending_verification").length,
-    suspended: teachers.filter((t) => t.status === "suspended").length,
-  }), [teachers]);
+  const stats = useMemo(
+    () => ({
+      total: teachers.length,
+      active: teachers.filter((t) => t.status === "active").length,
+      pending: teachers.filter((t) => t.status === "pending_verification").length,
+      suspended: teachers.filter((t) => t.status === "suspended").length,
+    }),
+    [teachers]
+  );
 
   const filteredTeachers = useMemo(() => {
     const q = searchQuery.toLowerCase();
@@ -154,7 +165,7 @@ export default function AdminTeachersPage() {
         t.email.toLowerCase().includes(q) ||
         t.first_name.toLowerCase().includes(q) ||
         t.last_name.toLowerCase().includes(q) ||
-        t.employee_id.toLowerCase().includes(q)
+        (t.employee_id ?? "").toLowerCase().includes(q)
     );
   }, [teachers, searchQuery]);
 
@@ -167,6 +178,7 @@ export default function AdminTeachersPage() {
 
   return (
     <div className="space-y-8 max-w-6xl">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
@@ -186,16 +198,24 @@ export default function AdminTeachersPage() {
         </button>
       </div>
 
+      {/* Error Banner */}
+      {error && !loading && (
+        <div className="border border-red-900/40 bg-red-950/20 rounded px-5 py-3 flex items-center justify-between">
+          <span className="text-xs text-red-400 font-bold">⚠ {error}</span>
+          <button onClick={fetchTeachers} className="text-xs text-red-400 hover:text-red-300 font-bold underline cursor-pointer">Retry</button>
+        </div>
+      )}
+
       {/* Stat Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total Enrolled", value: stats.total, color: "text-indigo-400", bg: "bg-indigo-950/30 border-indigo-900/40" },
-          { label: "Active", value: stats.active, color: "text-emerald-400", bg: "bg-emerald-950/30 border-emerald-900/40" },
-          { label: "Pending", value: stats.pending, color: "text-amber-400", bg: "bg-amber-950/30 border-amber-900/40" },
-          { label: "Suspended", value: stats.suspended, color: "text-red-400", bg: "bg-red-950/30 border-red-900/40" },
+          { label: "Total Enrolled", value: loading ? "—" : stats.total, color: "text-indigo-400", bg: "bg-indigo-950/30 border-indigo-900/40" },
+          { label: "Active", value: loading ? "—" : stats.active, color: "text-emerald-400", bg: "bg-emerald-950/30 border-emerald-900/40" },
+          { label: "Pending", value: loading ? "—" : stats.pending, color: "text-amber-400", bg: "bg-amber-950/30 border-amber-900/40" },
+          { label: "Suspended", value: loading ? "—" : stats.suspended, color: "text-red-400", bg: "bg-red-950/30 border-red-900/40" },
         ].map((s) => (
           <div key={s.label} className={`rounded-2xl border p-4 shadow-lg ${s.bg}`}>
-            <div className={`text-4xl font-black ${s.color}`}>{s.value}</div>
+            <div className={`text-4xl font-black ${s.color} ${loading ? "animate-pulse" : ""}`}>{s.value}</div>
             <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">{s.label}</div>
           </div>
         ))}
@@ -210,7 +230,7 @@ export default function AdminTeachersPage() {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-lg font-extrabold text-slate-100">Invite Educators</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Send activation links to new teaching staff</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Send 72-hour activation links to new teaching staff</p>
                 </div>
                 <button
                   onClick={closeModal}
@@ -224,17 +244,12 @@ export default function AdminTeachersPage() {
 
               {/* Step Indicator */}
               <div className="flex items-center gap-2 mt-4">
-                {[
-                  { n: 1, label: "Enter Emails" },
-                  { n: 2, label: "Confirmed" },
-                ].map((step, i) => (
+                {[{ n: 1, label: "Enter Emails" }, { n: 2, label: "Confirmed" }].map((step, i) => (
                   <React.Fragment key={step.n}>
                     <div className="flex items-center gap-1.5">
                       <div
                         className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                          inviteStep >= step.n
-                            ? "bg-indigo-600 text-white"
-                            : "bg-slate-800 text-slate-500"
+                          inviteStep >= step.n ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-500"
                         }`}
                       >
                         {inviteStep > step.n ? (
@@ -272,9 +287,7 @@ export default function AdminTeachersPage() {
               ) : (
                 <form onSubmit={handleBulkInvite} className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300">
-                      Email Addresses
-                    </label>
+                    <label className="text-xs font-semibold text-slate-300">Email Addresses</label>
                     <p className="text-[10px] text-slate-600">Separated by commas, spaces, or newlines</p>
                     <textarea
                       rows={5}
@@ -288,7 +301,7 @@ export default function AdminTeachersPage() {
                     </p>
                   </div>
 
-                  {inviteStatus && inviteStatus.startsWith("Error") && (
+                  {inviteStatus?.startsWith("Error") && (
                     <div className="p-3 rounded-lg text-xs font-medium bg-red-950/50 border border-red-900 text-red-400">
                       {inviteStatus}
                     </div>
@@ -304,9 +317,19 @@ export default function AdminTeachersPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer transition-all shadow-lg shadow-indigo-500/20"
+                      disabled={inviting}
+                      className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Dispatch Invitations
+                      {inviting ? (
+                        <>
+                          <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" strokeLinecap="round" />
+                          </svg>
+                          Sending...
+                        </>
+                      ) : (
+                        "Dispatch Invitations"
+                      )}
                     </button>
                   </div>
                 </form>
@@ -316,15 +339,14 @@ export default function AdminTeachersPage() {
         </div>
       )}
 
-      {/* Roster Table Card */}
+      {/* Roster Table */}
       <div className="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        {/* Table Toolbar */}
+        {/* Toolbar */}
         <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/30 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <div>
             <div className="text-sm font-bold text-slate-200">Educators Registered</div>
             <div className="text-[11px] text-slate-500 mt-0.5">{filteredTeachers.length} of {teachers.length} shown</div>
           </div>
-          {/* Search */}
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -340,7 +362,21 @@ export default function AdminTeachersPage() {
         </div>
 
         <div className="overflow-x-auto">
-          {filteredTeachers.length === 0 ? (
+          {loading ? (
+            /* Skeleton rows */
+            <div className="divide-y divide-slate-800/60">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="px-6 py-4 flex items-center gap-3 animate-pulse">
+                  <div className="w-9 h-9 rounded-full bg-slate-800 shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 w-32 bg-slate-800 rounded" />
+                    <div className="h-2 w-44 bg-slate-900 rounded" />
+                  </div>
+                  <div className="h-4 w-20 bg-slate-800 rounded-full" />
+                </div>
+              ))}
+            </div>
+          ) : filteredTeachers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center px-6">
               <div className="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -368,9 +404,8 @@ export default function AdminTeachersPage() {
                 <tr className="border-b border-slate-800 text-[10px] uppercase tracking-widest text-slate-500 font-bold">
                   <th className="px-6 py-3.5">Educator</th>
                   <th className="px-6 py-3.5">Employee ID</th>
-                  <th className="px-6 py-3.5">Date Invited</th>
+                  <th className="px-6 py-3.5">Joined</th>
                   <th className="px-6 py-3.5">Status</th>
-                  <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -378,7 +413,7 @@ export default function AdminTeachersPage() {
                   const cfg = STATUS_CONFIG[teacher.status];
                   return (
                     <tr key={teacher.id} className="hover:bg-slate-800/20 transition-colors">
-                      {/* Educator Cell */}
+                      {/* Educator cell */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <AvatarInitials teacher={teacher} />
@@ -386,8 +421,7 @@ export default function AdminTeachersPage() {
                             <div className="text-sm font-semibold text-slate-200">
                               {teacher.first_name || teacher.last_name
                                 ? `${teacher.first_name} ${teacher.last_name}`.trim()
-                                : <span className="text-slate-500 italic font-normal text-xs">Awaiting registration</span>
-                              }
+                                : <span className="text-slate-500 italic font-normal text-xs">Awaiting registration</span>}
                             </div>
                             <div className="text-[11px] text-slate-500 mt-0.5">{teacher.email}</div>
                           </div>
@@ -396,12 +430,12 @@ export default function AdminTeachersPage() {
                       {/* Employee ID */}
                       <td className="px-6 py-4">
                         <span className="font-mono text-[11px] text-slate-400 bg-slate-800/50 px-2 py-0.5 rounded">
-                          {teacher.employee_id || <span className="text-slate-600 not-italic">—</span>}
+                          {teacher.employee_id || <span className="text-slate-600">—</span>}
                         </span>
                       </td>
-                      {/* Date */}
+                      {/* Joined date */}
                       <td className="px-6 py-4 text-xs text-slate-400">
-                        {new Date(teacher.invited_at).toLocaleDateString(undefined, {
+                        {new Date(teacher.created_at).toLocaleDateString(undefined, {
                           year: "numeric",
                           month: "short",
                           day: "numeric",
@@ -413,22 +447,6 @@ export default function AdminTeachersPage() {
                           <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
                           {cfg.label}
                         </span>
-                      </td>
-                      {/* Actions */}
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => toggleStatus(teacher.id)}
-                          disabled={teacher.status === "pending_verification"}
-                          className={`text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-200 ${
-                            teacher.status === "pending_verification"
-                              ? "opacity-30 cursor-not-allowed bg-slate-800 text-slate-500"
-                              : teacher.status === "active"
-                              ? "bg-red-950/50 hover:bg-red-900/40 text-red-400 border border-red-900/50"
-                              : "bg-emerald-950/50 hover:bg-emerald-900/40 text-emerald-400 border border-emerald-900/50"
-                          }`}
-                        >
-                          {teacher.status === "active" ? "Suspend" : teacher.status === "suspended" ? "Activate" : "Pending"}
-                        </button>
                       </td>
                     </tr>
                   );

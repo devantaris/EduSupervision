@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> str:
         if isinstance(v, str) and v:
+            if v.startswith("postgresql://"):
+                v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+            elif v.startswith("postgres://"):
+                v = v.replace("postgres://", "postgresql+asyncpg://", 1)
             return v
         
         # Build asyncpg connection URL

@@ -3,10 +3,12 @@ from app.core.config import settings
 
 # Initialize Celery app
 # PostgreSQL database is used as the result backend for durability and auditability
+# Celery database result backend requires a synchronous driver (psycopg2)
+celery_backend_url = settings.DATABASE_URL.replace("postgresql+asyncpg://", "postgresql+psycopg2://")
 celery_app = Celery(
     "edusupervision_tasks",
     broker=settings.REDIS_URL,
-    backend=f"db+{settings.DATABASE_URL}",
+    backend=f"db+{celery_backend_url}",
 )
 
 # Apply performance and reliability configurations

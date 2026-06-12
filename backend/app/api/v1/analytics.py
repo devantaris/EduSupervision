@@ -242,7 +242,7 @@ async def get_institution_analytics(
             COUNT(*) AS cnt
         FROM ai_evaluations ae
         JOIN submissions s ON ae.submission_id = s.id,
-        LATERAL jsonb_array_elements(ae.scores) AS c
+        LATERAL jsonb_array_elements(ae.scores::jsonb) AS c
         WHERE s.institution_id = :inst_id
         GROUP BY criterion
         ORDER BY avg_score ASC

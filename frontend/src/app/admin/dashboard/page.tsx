@@ -1,36 +1,35 @@
-import React from "react";
-import Link from "next/link";
+"use client";
 
-const METRICS = [
-  {
-    label: "Active Teachers",
-    value: "0",
-    sub: "Onboarding pending activation",
-    subColor: "text-flame",
-    icon: "👥",
-  },
-  {
-    label: "Total Submissions",
-    value: "0",
-    sub: "No active assignments parsed",
-    subColor: "text-slate-500",
-    icon: "📋",
-  },
-  {
-    label: "Average Score",
-    value: "N/A",
-    sub: "Grades pending evaluation",
-    subColor: "text-slate-500",
-    icon: "🎯",
-  },
-  {
-    label: "Plagiarism Alerts",
-    value: "0",
-    sub: "All vectors verified clean",
-    subColor: "text-gold",
-    icon: "🛡️",
-  },
-];
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { apiFetch } from "@/lib/api";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface AssignmentSummary {
+  assignment_id: string;
+  title: string;
+  submission_count: number;
+  evaluated_count: number;
+  average_score: number | null;
+  completion_rate: number;
+  due_date: string | null;
+}
+
+interface InstitutionAnalytics {
+  institution_name: string;
+  total_teachers: number;
+  active_teachers: number;
+  total_submissions: number;
+  evaluated_submissions: number;
+  pending_submissions: number;
+  average_score: number | null;
+  plagiarism_flag_count: number;
+  completion_rate: number;
+  assignment_summaries: AssignmentSummary[];
+}
+
+// ─── Static quick actions ─────────────────────────────────────────────────────
 
 const QUICK_ACTIONS = [
   { label: "Invite Teacher", href: "/admin/teachers", desc: "Dispatches 72h invite key" },
@@ -39,11 +38,90 @@ const QUICK_ACTIONS = [
   { label: "View Roster", href: "/admin/teachers", desc: "Audits teacher logs & status" },
 ];
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatDate(iso: string | null) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function MetricSkeleton() {
+  return (
+    <div className="border-hairline p-6 bg-[#0c0f16]/20 relative min-h-[170px] animate-pulse">
+      <div className="h-2 w-20 bg-zinc-800 rounded mb-4" />
+      <div className="h-12 w-16 bg-zinc-700 rounded mt-6" />
+      <div className="h-2 w-28 bg-zinc-800 rounded mt-3" />
+    </div>
+  );
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function AdminDashboard() {
+  const [analytics, setAnalytics] = useState<InstitutionAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchAnalytics() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await apiFetch("/api/v1/analytics/institution");
+        if (res.ok) {
+          const data = await res.json();
+          setAnalytics(data);
+        } else {
+          setError("Failed to load analytics.");
+        }
+      } catch {
+        setError("Network error. Could not reach the backend.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnalytics();
+  }, []);
+
+  const metrics = [
+    {
+      label: "Total Teachers",
+      value: analytics?.total_teachers ?? 0,
+      display: loading ? "—" : String(analytics?.total_teachers ?? 0),
+      sub: analytics?.total_teachers === 0 ? "Onboarding pending activation" : `${analytics?.active_teachers ?? 0} with submissions`,
+      subColor: (analytics?.total_teachers ?? 0) === 0 ? "text-flame" : "text-emerald-400",
+      icon: "👥",
+    },
+    {
+      label: "Total Submissions",
+      value: analytics?.total_submissions ?? 0,
+      display: loading ? "—" : String(analytics?.total_submissions ?? 0),
+      sub: analytics?.total_submissions === 0 ? "No submissions yet" : `${analytics?.evaluated_submissions ?? 0} evaluated`,
+      subColor: "text-slate-500",
+      icon: "📋",
+    },
+    {
+      label: "Average Score",
+      value: analytics?.average_score ?? null,
+      display: loading ? "—" : analytics?.average_score != null ? analytics.average_score.toFixed(1) : "N/A",
+      sub: analytics?.average_score != null ? "Platform evaluation mean" : "Grades pending evaluation",
+      subColor: "text-slate-500",
+      icon: "🎯",
+    },
+    {
+      label: "Plagiarism Alerts",
+      value: analytics?.plagiarism_flag_count ?? 0,
+      display: loading ? "—" : String(analytics?.plagiarism_flag_count ?? 0),
+      sub: (analytics?.plagiarism_flag_count ?? 0) === 0 ? "All vectors verified clean" : "Pending admin review",
+      subColor: (analytics?.plagiarism_flag_count ?? 0) > 0 ? "text-flame" : "text-gold",
+      icon: "🛡️",
+    },
+  ];
+
   return (
     <div className="space-y-12 max-w-7xl animate-slate-reveal">
-      
-      {/* ── Page Header (Editorial) ── */}
+
+      {/* ── Page Header ── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-hairline-b pb-8">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 border border-flame/30 bg-amber-950/20 rounded px-2.5 py-0.5 text-[9px] tracking-widest uppercase text-flame">
@@ -59,44 +137,45 @@ export default function AdminDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2 text-[10px] tracking-widest uppercase font-bold text-slate-500 border border-hairline px-4 py-2 bg-[#0c0f16]/30">
-          Last Synced: Just Now
+          {loading ? "Syncing..." : error ? "Sync Error" : "Last Synced: Just Now"}
         </div>
       </div>
 
-      {/* ── Metric Dossiers (Asymmetrical plates) ── */}
+      {/* ── Error State ── */}
+      {error && !loading && (
+        <div className="border border-red-900/40 bg-red-950/20 rounded px-5 py-3 text-xs text-red-400 font-bold">
+          ⚠ {error}
+        </div>
+      )}
+
+      {/* ── Metric Dossiers ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-        {METRICS.map((m) => (
-          <div
-            key={m.label}
-            className="border-hairline p-6 bg-[#0c0f16]/20 relative flex flex-col justify-between group overflow-hidden min-h-[170px]"
-          >
-            {/* Fine decoration */}
-            <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
-            
-            <div className="flex items-start justify-between">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
-                {m.label}
-              </span>
-              <span className="text-base opacity-40 group-hover:opacity-100 transition-opacity">{m.icon}</span>
-            </div>
-            
-            <div className="space-y-1 mt-4">
-              <div className="font-serif text-5xl font-black text-white tracking-tighter">{m.value}</div>
-              <span className={`text-[9px] tracking-wider uppercase font-bold ${m.subColor}`}>
-                {m.sub}
-              </span>
-            </div>
-          </div>
-        ))}
+        {loading
+          ? [0, 1, 2, 3].map((i) => <MetricSkeleton key={i} />)
+          : metrics.map((m) => (
+              <div
+                key={m.label}
+                className="border-hairline p-6 bg-[#0c0f16]/20 relative flex flex-col justify-between group overflow-hidden min-h-[170px]"
+              >
+                <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
+                <div className="flex items-start justify-between">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">{m.label}</span>
+                  <span className="text-base opacity-40 group-hover:opacity-100 transition-opacity">{m.icon}</span>
+                </div>
+                <div className="space-y-1 mt-4">
+                  <div className="font-serif text-5xl font-black text-white tracking-tighter">{m.display}</div>
+                  <span className={`text-[9px] tracking-wider uppercase font-bold ${m.subColor}`}>{m.sub}</span>
+                </div>
+              </div>
+            ))}
       </div>
 
-      {/* ── Double Column Asymmetrical Workspaces ── */}
+      {/* ── Double Column Workspaces ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Action Box (col-span-4) */}
+
+        {/* Left: Quick Actions */}
         <div className="lg:col-span-4 border-hairline p-8 bg-[#0c0f16]/20 relative flex flex-col justify-between">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
-          
           <div className="space-y-6">
             <h2 className="font-serif text-lg font-bold text-white uppercase tracking-widest border-hairline-b pb-4">
               Supervision Tools
@@ -112,58 +191,90 @@ export default function AdminDashboard() {
                     <span>{action.label}</span>
                     <span>→</span>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-light leading-relaxed">
-                    {action.desc}
-                  </span>
+                  <span className="text-[10px] text-slate-500 font-light leading-relaxed">{action.desc}</span>
                 </Link>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Right Status Timeline (col-span-8) */}
+        {/* Right: Live Assignment Overview */}
         <div className="lg:col-span-8 border border-hairline bg-[#0c0f16]/10 p-8 relative flex flex-col justify-between">
           <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-gold/30" />
-          
+
           <div className="space-y-8">
             <div className="flex items-center justify-between border-hairline-b pb-4">
               <h2 className="font-serif text-lg font-bold text-white uppercase tracking-widest">
-                Platform Build Phase Status
+                Live Assignment Overview
               </h2>
-              <span className="inline-flex items-center gap-1.5 text-[9px] tracking-widest uppercase bg-amber-950/10 text-gold border border-gold/30 px-3 py-1 font-bold">
-                Phase 1 Active
-              </span>
+              <Link
+                href="/admin/assignments"
+                className="text-[9px] tracking-widest uppercase font-bold text-gold hover:text-white transition-colors"
+              >
+                Manage All →
+              </Link>
             </div>
 
-            {/* Micro Asymmetrical Vertical Line Timeline */}
-            <div className="relative pl-6 border-l border-hairline space-y-6 my-2">
-              {[
-                { label: "Database Core Schemas & Migration Provisioning", done: true, phase: "Phase 1" },
-                { label: "Stateless Asymmetric RS256 Auth & Cross-tenant Security", done: true, phase: "Phase 2" },
-                { label: "Bulk Cohort Inviter & Register Verification Links", done: true, phase: "Phase 3" },
-                { label: "Presigning Material Ingestion & Debounced Telemetry", done: true, phase: "Phase 4" },
-                { label: "Asynchronous Gemini Evaluator & Vector Plagiarism Index", done: false, phase: "Phase 5" },
-                { label: "Longitudinal Analytics ledger & supervision dashboards", done: false, phase: "Phase 6" },
-              ].map((item) => (
-                <div key={item.label} className="relative group">
-                  {/* Point Indicator */}
-                  <span className={`absolute -left-[30px] top-1 h-3.5 w-3.5 rounded-full border border-background flex items-center justify-center
-                    ${item.done ? 'bg-gold' : 'bg-background border-hairline'}
-                  `} />
-                  
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-slate-200 group-hover:text-gold transition-colors duration-300">
-                        {item.label}
-                      </span>
-                      <span className="text-[8px] uppercase tracking-widest text-slate-500 font-bold">
-                        {item.phase}
-                      </span>
+            {loading ? (
+              <div className="space-y-4">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="flex items-center gap-4 animate-pulse">
+                    <div className="w-3 h-3 rounded-full bg-zinc-700 shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 w-3/4 bg-zinc-800 rounded" />
+                      <div className="h-2 w-1/3 bg-zinc-900 rounded" />
                     </div>
+                    <div className="h-3 w-12 bg-zinc-800 rounded" />
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : analytics?.assignment_summaries?.length ? (
+              <div className="relative pl-6 border-l border-hairline space-y-6 my-2">
+                {analytics.assignment_summaries.slice(0, 6).map((a) => {
+                  const hasSubmissions = a.submission_count > 0;
+                  return (
+                    <div key={a.assignment_id} className="relative group">
+                      <span
+                        className={`absolute -left-[30px] top-1 h-3.5 w-3.5 rounded-full border border-background flex items-center justify-center
+                          ${hasSubmissions ? "bg-gold" : "bg-background border-hairline"}
+                        `}
+                      />
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <span className="text-xs font-bold text-slate-200 group-hover:text-gold transition-colors duration-300">
+                            {a.title}
+                          </span>
+                          <span className="text-[8px] uppercase tracking-widest text-slate-500 font-bold">
+                            {a.submission_count} submission{a.submission_count !== 1 ? "s" : ""}
+                          </span>
+                          {a.average_score != null && (
+                            <span className="text-[8px] uppercase tracking-widest text-gold font-bold">
+                              Avg {a.average_score.toFixed(1)}
+                            </span>
+                          )}
+                          {a.due_date && (
+                            <span className="text-[8px] uppercase tracking-widest text-slate-600 font-bold">
+                              Due {formatDate(a.due_date)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 text-center space-y-3">
+                <span className="text-3xl opacity-20">📋</span>
+                <p className="text-xs text-slate-500">No assignments created yet.</p>
+                <Link
+                  href="/admin/assignments"
+                  className="text-[10px] tracking-widest uppercase font-bold text-gold hover:text-white transition-colors"
+                >
+                  Create First Assignment →
+                </Link>
+              </div>
+            )}
           </div>
 
           <p className="text-[10px] text-slate-500 font-light border-t border-hairline pt-6 mt-8">

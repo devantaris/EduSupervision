@@ -257,7 +257,7 @@ export default function AdminAssignmentsPage() {
   const fetchAssignments = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await apiFetch("/api/assignments");
+      const res = await apiFetch("/api/v1/assignments");
       if (res.ok) {
         const data = await res.json();
         setAssignments(Array.isArray(data) ? data : data.assignments ?? []);
@@ -324,7 +324,7 @@ export default function AdminAssignmentsPage() {
           weight: parseFloat(c.weight) || 0,
         })),
       };
-      const res = await apiFetch("/api/assignments", {
+      const res = await apiFetch("/api/v1/assignments", {
         method: "POST",
         body: JSON.stringify(payload),
       });
@@ -354,7 +354,7 @@ export default function AdminAssignmentsPage() {
   async function handleDelete(id: string) {
     if (!confirm("Delete this assignment? This cannot be undone.")) return;
     try {
-      const res = await apiFetch(`/api/assignments/${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/v1/assignments/${id}`, { method: "DELETE" });
       if (res.ok) {
         setAssignments((prev) => prev.filter((a) => a.id !== id));
         setToast({ type: "success", msg: "Assignment deleted." });

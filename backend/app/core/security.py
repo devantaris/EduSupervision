@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 from jose import jwt, JWTError
@@ -106,4 +107,3 @@ def verify_jwt_token(token: str) -> Optional[Dict[str, Any]]:
         return payload
     except JWTError:
         return None
-import uuid

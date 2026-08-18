@@ -445,6 +445,7 @@ async def get_ministry_overview(
 
 # ─── Teacher Personal Analytics ───────────────────────────────────────────────
 
+@router.get("/me", response_model=TeacherPersonalAnalytics)
 @router.get("/teacher/me", response_model=TeacherPersonalAnalytics)
 async def get_my_analytics(
     db: AsyncSession = Depends(get_db),

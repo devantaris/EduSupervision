@@ -220,6 +220,24 @@ async def list_submissions(
     return SubmissionListResponse(submissions=list(submissions), total=total)
 
 
+@router.get("/me", response_model=SubmissionListResponse)
+async def list_my_submissions(
+    assignment_id: Optional[uuid.UUID] = None,
+    page: int = 1,
+    limit: int = 20,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Alias for teacher submission listing."""
+    return await list_submissions(
+        assignment_id=assignment_id,
+        page=page,
+        limit=limit,
+        db=db,
+        current_user=current_user,
+    )
+
+
 # ─── Single Submission Detail ─────────────────────────────────────────────────
 
 @router.get("/{submission_id}", response_model=SubmissionDetailOut)

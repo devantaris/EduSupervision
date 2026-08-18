@@ -99,13 +99,18 @@ async def refresh_tokens(
             detail="Invalid or expired refresh token",
         )
 
-    # 2. Check Redis denylist to prevent replay attacks
-    is_revoked = await redis.get(f"revoked_token:{token}")
-    if is_revoked:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token has been revoked",
-        )
+    # 2. Check Redis denylist to prevent replay attacks (graceful fallback if Redis is offline)
+    try:
+        is_revoked = await redis.get(f"revoked_token:{token}")
+        if is_revoked:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Refresh token has been revoked",
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        pass
 
     # 3. Retrieve user from DB
     user_id = claims.get("sub")
@@ -120,11 +125,14 @@ async def refresh_tokens(
         )
 
     # 4. Invalidate old refresh token (Store in Redis with remaining expiration time)
-    exp_timestamp = claims.get("exp")
-    now_timestamp = int(datetime.now(timezone.utc).timestamp())
-    remaining_seconds = exp_timestamp - now_timestamp
-    if remaining_seconds > 0:
-        await redis.setex(f"revoked_token:{token}", remaining_seconds, "1")
+    try:
+        exp_timestamp = claims.get("exp")
+        now_timestamp = int(datetime.now(timezone.utc).timestamp())
+        remaining_seconds = exp_timestamp - now_timestamp
+        if remaining_seconds > 0:
+            await redis.setex(f"revoked_token:{token}", remaining_seconds, "1")
+    except Exception:
+        pass
 
     # 5. Generate new pair
     access_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

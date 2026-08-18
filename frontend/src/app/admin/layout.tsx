@@ -66,13 +66,13 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
       <div className="px-6 pt-8 pb-6 border-b hairline">
         <Link href="/admin/dashboard" className="flex flex-col gap-2" onClick={onClose}>
           <div className="flex items-center gap-3">
-            <InstitutionSeal initials="OA" />
+            <InstitutionSeal initials="RJ" />
             <div className="flex flex-col">
-              <span className="font-cinzel text-lg tracking-[0.1em] font-bold uppercase text-gold">
-                Oakridge Academy
+              <span className="font-cinzel text-base tracking-[0.05em] font-bold uppercase text-gold leading-tight">
+                Rajasthan Directorate
               </span>
               <span className="text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                Administrator
+                Academic Registry
               </span>
             </div>
           </div>

@@ -15,13 +15,24 @@ export async function POST() {
 
     // Call FastAPI refresh endpoint
     const backendUrl = process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000";
-    const fastapiRes = await fetch(`${backendUrl}/api/v1/auth/refresh`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+    let fastapiRes: Response;
+    try {
+      fastapiRes = await fetch(`${backendUrl}/api/v1/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+        signal: AbortSignal.timeout(8000),
+      });
+    } catch {
+      const response = NextResponse.json(
+        { error: "Cannot reach backend server" },
+        { status: 503 }
+      );
+      response.cookies.delete("refresh_token");
+      return response;
+    }
 
     if (!fastapiRes.ok) {
       const errorData = await fastapiRes.json().catch(() => ({}));

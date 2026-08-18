@@ -6,13 +6,28 @@ export async function POST(request: Request) {
     
     // Proxy request to the backend FastAPI server
     const backendUrl = process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000";
-    const fastapiRes = await fetch(`${backendUrl}/api/v1/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    
+    let fastapiRes: Response;
+    try {
+      fastapiRes = await fetch(`${backendUrl}/api/v1/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(8000), // 8-second timeout to prevent infinite hang
+      });
+    } catch (networkErr: unknown) {
+      const isTimeout = networkErr instanceof Error && networkErr.name === "TimeoutError";
+      return NextResponse.json(
+        {
+          error: isTimeout
+            ? "Backend connection timed out. Please verify that the backend server is running and BACKEND_INTERNAL_URL is set in Vercel settings."
+            : "Cannot reach backend API server. Please ensure the backend is deployed and BACKEND_INTERNAL_URL is configured in Vercel.",
+        },
+        { status: 503 }
+      );
+    }
 
     if (!fastapiRes.ok) {
       const errorData = await fastapiRes.json().catch(() => ({}));

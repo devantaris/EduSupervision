@@ -14,13 +14,22 @@ export async function POST(request: Request) {
     
     // Proxy request to the backend FastAPI server
     const backendUrl = process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000";
-    const fastapiRes = await fetch(`${backendUrl}/api/v1/teachers/register/${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ first_name, last_name, employee_id, password }),
-    });
+    let fastapiRes: Response;
+    try {
+      fastapiRes = await fetch(`${backendUrl}/api/v1/teachers/register/${token}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ first_name, last_name, employee_id, password }),
+        signal: AbortSignal.timeout(8000),
+      });
+    } catch {
+      return NextResponse.json(
+        { error: "Cannot reach backend server. Please verify BACKEND_INTERNAL_URL." },
+        { status: 503 }
+      );
+    }
 
     if (!fastapiRes.ok) {
       const errorData = await fastapiRes.json().catch(() => ({}));

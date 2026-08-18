@@ -77,37 +77,19 @@ function daysUntil(iso: string): number | null {
 
 function EmptyState({ onNew }: { onNew: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
-      {/* SVG placeholder illustration */}
-      <div className="w-32 h-32 mb-6 rounded-3xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center">
-        <svg
-          viewBox="0 0 80 80"
-          fill="none"
-          className="w-16 h-16 opacity-40"
-          aria-hidden="true"
-        >
-          <rect x="10" y="14" width="60" height="52" rx="6" fill="#6366f1" fillOpacity="0.15" stroke="#6366f1" strokeWidth="1.5" />
-          <rect x="20" y="26" width="40" height="4" rx="2" fill="#6366f1" fillOpacity="0.5" />
-          <rect x="20" y="36" width="28" height="4" rx="2" fill="#6366f1" fillOpacity="0.3" />
-          <rect x="20" y="46" width="34" height="4" rx="2" fill="#6366f1" fillOpacity="0.3" />
-          <circle cx="60" cy="58" r="12" fill="#6366f1" fillOpacity="0.2" stroke="#6366f1" strokeWidth="1.5" />
-          <path d="M60 53v10M55 58h10" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" />
-        </svg>
+    <div className="flex flex-col items-center justify-center py-24 px-8 text-center bg-obsidian rounded-xl border hairline">
+      <div className="w-32 h-32 mb-6 rounded-3xl bg-void border hairline flex items-center justify-center shadow-inner">
+        <span className="text-4xl text-brass">📝</span>
       </div>
-      <h3 className="text-xl font-bold text-slate-200 mb-2">
-        No assignments yet
+      <h3 className="text-xl font-cinzel font-bold text-parchment mb-2 tracking-widest uppercase">
+        No Assignments Yet
       </h3>
-      <p className="text-sm text-slate-500 max-w-xs leading-relaxed mb-6">
-        Create your first rubric-graded assignment and let the AI evaluate
-        teacher submissions automatically.
+      <p className="text-sm text-slate-500 max-w-xs leading-relaxed mb-6 font-playfair italic">
+        Create your first rubric-graded assignment and let the AI evaluate teacher submissions automatically.
       </p>
       <button
         onClick={onNew}
-        className="
-          inline-flex items-center gap-2 px-5 py-2.5
-          bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl
-          shadow-lg shadow-indigo-500/20 transition-all duration-200 cursor-pointer
-        "
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment font-bold text-sm rounded-md shadow-lg transition-all duration-200 cursor-pointer hover:shadow-red-900/20"
       >
         <span className="text-base">📝</span>
         Create First Assignment
@@ -130,32 +112,30 @@ function AssignmentCard({
   const overdue = days !== null && days < 0;
 
   return (
-    <article className="
-      bg-slate-900/40 border border-slate-800 rounded-2xl p-6
-      shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/10
-      transition-all duration-200 flex flex-col gap-4
-    ">
+    <article className="bg-obsidian border hairline rounded-xl p-6 shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col gap-4 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+      
       {/* Header row */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="relative z-10 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-bold text-slate-100 leading-snug truncate pr-2">
+          <h3 className="text-sm font-bold text-parchment leading-snug truncate pr-2 font-cinzel tracking-wider">
             {a.title}
           </h3>
-          <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed font-playfair italic">
             {a.description || "No description provided."}
           </p>
         </div>
         <span
-          className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase ${badge.classes}`}
+          className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-[0.22em] uppercase ${badge.classes}`}
         >
           {badge.label}
         </span>
       </div>
 
       {/* Meta grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-slate-800/30 rounded-xl p-3">
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-1">
+      <div className="relative z-10 grid grid-cols-2 gap-3">
+        <div className="bg-void rounded-md border hairline p-3">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold mb-1">
             Due Date
           </p>
           <p
@@ -164,13 +144,13 @@ function AssignmentCard({
                 ? "text-red-400"
                 : urgent
                 ? "text-amber-400"
-                : "text-slate-200"
+                : "text-parchment"
             }`}
           >
             {formatDate(a.due_date)}
           </p>
           {days !== null && (
-            <p className="text-[10px] text-slate-600 mt-0.5">
+            <p className="text-[10px] text-slate-600 mt-0.5 font-playfair italic">
               {overdue
                 ? `${Math.abs(days)}d overdue`
                 : days === 0
@@ -179,30 +159,30 @@ function AssignmentCard({
             </p>
           )}
         </div>
-        <div className="bg-slate-800/30 rounded-xl p-3">
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-1">
+        <div className="bg-void rounded-md border hairline p-3">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold mb-1">
             Max Score
           </p>
-          <p className="text-sm font-bold text-slate-200">{a.max_score} pts</p>
+          <p className="text-sm font-bold text-parchment font-cinzel">{a.max_score} pts</p>
         </div>
       </div>
 
       {/* Rubric chips */}
-      <div>
-        <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">
+      <div className="relative z-10">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold mb-2">
           Rubric · {a.rubric_criteria?.length ?? 0} criteria
         </p>
         <div className="flex flex-wrap gap-1.5">
           {(a.rubric_criteria ?? []).slice(0, 3).map((c) => (
             <span
               key={c.id}
-              className="px-2 py-0.5 rounded-full bg-indigo-950/50 border border-indigo-800/40 text-indigo-300 text-[10px] font-semibold"
+              className="px-2 py-0.5 rounded-full bg-obsidian border hairline text-brass text-[10px] font-semibold"
             >
               {c.label} · {c.weight}%
             </span>
           ))}
           {(a.rubric_criteria?.length ?? 0) > 3 && (
-            <span className="px-2 py-0.5 rounded-full bg-slate-800/50 border border-slate-700/40 text-slate-500 text-[10px]">
+            <span className="px-2 py-0.5 rounded-full bg-void border hairline text-slate-500 text-[10px]">
               +{(a.rubric_criteria?.length ?? 0) - 3} more
             </span>
           )}
@@ -210,17 +190,13 @@ function AssignmentCard({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-2 border-t border-slate-800/50">
-        <p className="text-[10px] text-slate-600">
+      <div className="relative z-10 flex items-center justify-between pt-2 border-t hairline-w mt-auto">
+        <p className="text-[10px] text-slate-600 font-playfair italic">
           Created {formatDate(a.created_at)}
         </p>
         <button
           onClick={() => onDelete(a.id)}
-          className="
-            text-[10px] font-bold text-red-500/70 hover:text-red-400
-            px-2 py-1 rounded-lg hover:bg-red-950/30
-            transition-all duration-150 cursor-pointer
-          "
+          className="text-[10px] font-bold text-red-500 hover:text-red-400 px-2 py-1 rounded-md hover:bg-red-950/30 transition-all duration-150 cursor-pointer uppercase tracking-widest"
         >
           Delete
         </button>
@@ -403,22 +379,18 @@ export default function AdminAssignmentsPage() {
       )}
 
       {/* ── Page header ── */}
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b hairline-w pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100">
+          <h1 className="text-3xl font-cinzel font-bold text-parchment tracking-[0.1em] uppercase">
             Assignments
           </h1>
-          <p className="text-slate-400 text-sm mt-1.5">
+          <p className="text-slate-400 text-sm mt-1.5 font-playfair italic">
             Publish rubric-graded assignments and configure AI evaluation criteria for your teaching cohort.
           </p>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="
-            shrink-0 inline-flex items-center gap-2 px-5 py-2.5
-            bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl
-            shadow-lg shadow-indigo-500/20 transition-all duration-200 cursor-pointer
-          "
+          className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment font-bold text-xs rounded-md shadow-lg shadow-red-900/20 transition-all duration-200 cursor-pointer uppercase tracking-widest"
         >
           <span>{showForm ? "✕" : "+"}</span>
           {showForm ? "Cancel" : "New Assignment"}
@@ -427,16 +399,17 @@ export default function AdminAssignmentsPage() {
 
       {/* ── Create Form ── */}
       {showForm && (
-        <section aria-label="Create assignment">
-          <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 md:p-8 shadow-2xl">
-            <h2 className="text-lg font-extrabold text-slate-100 mb-6 flex items-center gap-2">
-              <span>📝</span> New Assignment
+        <section aria-label="Create assignment" className="animate-slate-reveal">
+          <div className="bg-obsidian border hairline rounded-xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+            <h2 className="text-lg font-cinzel font-bold text-parchment mb-6 flex items-center gap-2 tracking-[0.1em] uppercase relative z-10">
+              New Assignment
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
               {/* Row 1: Title */}
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em] mb-2">
                   Title <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -445,17 +418,13 @@ export default function AdminAssignmentsPage() {
                   placeholder="e.g. Inclusive Teaching Strategies — Module 2"
                   value={form.title}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                  className="
-                    w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3
-                    text-sm text-slate-100 placeholder-slate-600
-                    focus:outline-none focus:border-indigo-500 transition-colors
-                  "
+                  className="w-full bg-void border hairline rounded-md px-4 py-3 text-sm text-parchment placeholder-slate-600 focus:outline-none focus:border-brass/50 transition-colors"
                 />
               </div>
 
               {/* Row 2: Description */}
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em] mb-2">
                   Description
                 </label>
                 <textarea
@@ -463,34 +432,25 @@ export default function AdminAssignmentsPage() {
                   placeholder="Describe the assignment goals and expectations for teachers…"
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  className="
-                    w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3
-                    text-sm text-slate-100 placeholder-slate-600 resize-none
-                    focus:outline-none focus:border-indigo-500 transition-colors
-                  "
+                  className="w-full bg-void border hairline rounded-md px-4 py-3 text-sm text-parchment placeholder-slate-600 resize-none focus:outline-none focus:border-brass/50 transition-colors"
                 />
               </div>
 
               {/* Row 3: Due date + Max score */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em] mb-2">
                     Due Date
                   </label>
                   <input
                     type="date"
                     value={form.due_date}
                     onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))}
-                    className="
-                      w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3
-                      text-sm text-slate-100 placeholder-slate-600
-                      focus:outline-none focus:border-indigo-500 transition-colors
-                      [color-scheme:dark]
-                    "
+                    className="w-full bg-void border hairline rounded-md px-4 py-3 text-sm text-parchment focus:outline-none focus:border-brass/50 transition-colors [color-scheme:dark]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em] mb-2">
                     Max Score (pts)
                   </label>
                   <input
@@ -499,11 +459,7 @@ export default function AdminAssignmentsPage() {
                     max={1000}
                     value={form.max_score}
                     onChange={(e) => setForm((f) => ({ ...f, max_score: e.target.value }))}
-                    className="
-                      w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3
-                      text-sm text-slate-100 placeholder-slate-600
-                      focus:outline-none focus:border-indigo-500 transition-colors
-                    "
+                    className="w-full bg-void border hairline rounded-md px-4 py-3 text-sm text-parchment focus:outline-none focus:border-brass/50 transition-colors"
                   />
                 </div>
               </div>
@@ -511,15 +467,15 @@ export default function AdminAssignmentsPage() {
               {/* Row 4: Rubric Criteria */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    Rubric Criteria
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em]">
+                    Rubric Weight Calculator
                   </label>
                   <div className="flex items-center gap-3">
                     <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest ${
                         Math.abs(weightSum - 100) < 0.1
                           ? "bg-emerald-950/60 text-emerald-400 border border-emerald-900/60"
-                          : "bg-amber-950/60 text-amber-400 border border-amber-900/60"
+                          : "bg-red-950/60 text-red-400 border border-red-900/60"
                       }`}
                     >
                       {weightSum.toFixed(0)}% / 100%
@@ -527,20 +483,25 @@ export default function AdminAssignmentsPage() {
                     <button
                       type="button"
                       onClick={addCriterion}
-                      className="text-xs text-indigo-400 hover:text-indigo-300 font-bold cursor-pointer transition-colors"
+                      className="text-[10px] text-brass hover:text-gold uppercase font-bold cursor-pointer transition-colors"
                     >
                       + Add criterion
                     </button>
                   </div>
                 </div>
 
+                {/* Live total bar */}
+                <div className="h-1.5 w-full bg-void rounded-full overflow-hidden mb-4 border hairline flex">
+                  <div className={`h-full transition-all duration-300 ${Math.abs(weightSum - 100) < 0.1 ? 'bg-emerald-500' : 'bg-brass'}`} style={{ width: `${Math.min(weightSum, 100)}%` }} />
+                </div>
+
                 <div className="space-y-3">
                   {form.criteria.map((c, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 bg-slate-950/60 border border-slate-800/70 rounded-xl p-3"
+                      className="flex items-center gap-3 bg-void border hairline rounded-md p-3"
                     >
-                      <span className="shrink-0 w-6 h-6 rounded-lg bg-indigo-950/60 text-indigo-400 text-[10px] font-black flex items-center justify-center border border-indigo-800/40">
+                      <span className="shrink-0 w-6 h-6 rounded border hairline bg-obsidian text-slate-500 text-[10px] font-cinzel font-bold flex items-center justify-center">
                         {idx + 1}
                       </span>
                       <input
@@ -548,12 +509,18 @@ export default function AdminAssignmentsPage() {
                         placeholder="Criterion label…"
                         value={c.label}
                         onChange={(e) => updateCriterion(idx, "label", e.target.value)}
-                        className="
-                          flex-1 bg-transparent border-b border-slate-800 py-1
-                          text-sm text-slate-200 placeholder-slate-600
-                          focus:outline-none focus:border-indigo-500 transition-colors
-                        "
+                        className="flex-1 bg-transparent border-b hairline py-1 text-sm text-parchment placeholder-slate-600 focus:outline-none focus:border-brass/50 transition-colors"
                       />
+                      <div className="flex items-center gap-2 shrink-0 w-1/3 max-w-[120px]">
+                        <input 
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={c.weight}
+                          onChange={(e) => updateCriterion(idx, "weight", e.target.value)}
+                          className="w-full accent-brass"
+                        />
+                      </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <input
                           type="number"
@@ -562,11 +529,7 @@ export default function AdminAssignmentsPage() {
                           placeholder="0"
                           value={c.weight}
                           onChange={(e) => updateCriterion(idx, "weight", e.target.value)}
-                          className="
-                            w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1
-                            text-sm text-center text-slate-200
-                            focus:outline-none focus:border-indigo-500 transition-colors
-                          "
+                          className="w-14 bg-obsidian border hairline rounded-md px-2 py-1 text-sm text-center text-parchment focus:outline-none focus:border-brass/50 transition-colors font-mono"
                         />
                         <span className="text-xs text-slate-600">%</span>
                       </div>
@@ -574,7 +537,7 @@ export default function AdminAssignmentsPage() {
                         <button
                           type="button"
                           onClick={() => removeCriterion(idx)}
-                          className="shrink-0 text-slate-600 hover:text-red-400 transition-colors cursor-pointer text-sm"
+                          className="shrink-0 text-slate-600 hover:text-red-400 transition-colors cursor-pointer text-sm ml-2"
                           aria-label="Remove criterion"
                         >
                           ✕
@@ -583,29 +546,24 @@ export default function AdminAssignmentsPage() {
                     </div>
                   ))}
                 </div>
-                <p className="text-[11px] text-slate-600 mt-2">
+                <p className="text-[10px] font-playfair italic text-slate-500 mt-3">
                   Weights must add up to exactly 100%. AI evaluation will use these criteria.
                 </p>
               </div>
 
               {/* Submit */}
-              <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-800/50">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t hairline-w">
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold transition-all cursor-pointer"
+                  className="px-4 py-2 rounded-md border hairline text-xs text-brass hover:border-brass/50 transition-all cursor-pointer uppercase tracking-widest font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="
-                    inline-flex items-center gap-2 px-6 py-2.5
-                    bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl
-                    shadow-lg shadow-indigo-500/20 transition-all duration-200
-                    disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
-                  "
+                  disabled={submitting || Math.abs(weightSum - 100) > 0.1}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment font-bold text-xs uppercase tracking-widest rounded-md shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {submitting ? (
                     <>
@@ -615,7 +573,7 @@ export default function AdminAssignmentsPage() {
                       Creating…
                     </>
                   ) : (
-                    "Publish Assignment"
+                    "Issue Assignment to Cohort"
                   )}
                 </button>
               </div>

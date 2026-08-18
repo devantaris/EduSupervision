@@ -202,9 +202,9 @@ export default function AdminContentPage() {
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100">Content Library</h1>
-        <p className="text-slate-400 text-sm mt-1">
+      <div className="border-b hairline-w pb-6">
+        <h1 className="text-3xl font-cinzel font-bold text-parchment tracking-[0.1em] uppercase">Content Library</h1>
+        <p className="text-slate-400 text-sm mt-1.5 font-playfair italic">
           Upload and manage curriculum textbooks, pedagogical videos, and guidelines for teaching staff.
         </p>
       </div>
@@ -212,28 +212,32 @@ export default function AdminContentPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Total Materials", value: materials.length, color: "text-indigo-400", bg: "bg-indigo-950/30 border-indigo-900/40" },
-          { label: "Videos", value: totalVideos, color: "text-emerald-400", bg: "bg-emerald-950/30 border-emerald-900/40" },
-          { label: "PDFs / Docs", value: totalPDFs, color: "text-amber-400", bg: "bg-amber-950/30 border-amber-900/40" },
+          { label: "Total Materials", value: materials.length, color: "text-brass" },
+          { label: "Videos", value: totalVideos, color: "text-emerald-400" },
+          { label: "PDFs / Docs", value: totalPDFs, color: "text-amber-400" },
         ].map((s) => (
-          <div key={s.label} className={`rounded-2xl border p-4 shadow-lg ${s.bg}`}>
-            <div className={`text-4xl font-black ${s.color}`}>{s.value}</div>
-            <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">{s.label}</div>
+          <div key={s.label} className="bg-obsidian border hairline rounded-xl p-6 shadow-md relative overflow-hidden group">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+            <div className="relative z-10">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500 font-bold mb-4">{s.label}</p>
+              <p className={`text-4xl font-cinzel font-bold tracking-wider ${s.color}`}>{s.value}</p>
+            </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Upload Form */}
-        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 lg:col-span-1 h-fit">
-          <div>
-            <h2 className="text-lg font-bold text-slate-200">Publish Material</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Distribute new educational units to teachers.</p>
+        <div className="bg-obsidian border hairline rounded-xl p-6 shadow-xl space-y-5 lg:col-span-1 h-fit relative">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+          <div className="relative z-10 border-b hairline-w pb-4">
+            <h2 className="text-lg font-cinzel font-bold text-parchment uppercase tracking-[0.1em]">Publish Material</h2>
+            <p className="text-[10px] text-slate-500 mt-1 font-playfair italic">Distribute new educational units to teachers.</p>
           </div>
 
-          <form onSubmit={handleUploadAndCreate} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Title</label>
+          <form onSubmit={handleUploadAndCreate} className="space-y-4 relative z-10">
+            <div className="space-y-1.5">
+              <label className="text-[10px] uppercase tracking-[0.22em] font-bold text-slate-400">Title</label>
               <input
                 type="text"
                 value={title}
@@ -241,29 +245,29 @@ export default function AdminContentPage() {
                 placeholder="e.g. Lesson Plan Methodology Guide"
                 required
                 disabled={loading}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder:text-slate-700 text-xs focus:outline-none focus:border-indigo-500 transition-colors"
+                className="field w-full bg-void border hairline rounded-md px-3 py-2 text-parchment placeholder:text-slate-700 text-xs focus:outline-none focus:border-brass/50 transition-colors"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Description</label>
+            <div className="space-y-1.5">
+              <label className="text-[10px] uppercase tracking-[0.22em] font-bold text-slate-400">Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="e.g. Standard guidelines on formatting and pedagogical progression..."
                 rows={3}
                 disabled={loading}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-200 placeholder:text-slate-700 text-xs focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+                className="field w-full bg-void border hairline rounded-md p-3 text-parchment placeholder:text-slate-700 text-xs focus:outline-none focus:border-brass/50 transition-colors resize-none"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Material Type</label>
+            <div className="space-y-1.5">
+              <label className="text-[10px] uppercase tracking-[0.22em] font-bold text-slate-400">Material Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as "video" | "pdf" | "document")}
                 disabled={loading}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+                className="field w-full bg-void border hairline rounded-md px-3 py-2 text-parchment text-xs focus:outline-none focus:border-brass/50 transition-colors cursor-pointer"
               >
                 <option value="pdf">PDF Document</option>
                 <option value="video">Instructional Video</option>
@@ -272,21 +276,21 @@ export default function AdminContentPage() {
             </div>
 
             {/* Drag & Drop Upload Zone */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Upload File <span className="text-slate-600 font-normal">(Max 50MB)</span></label>
+            <div className="space-y-1.5">
+              <label className="text-[10px] uppercase tracking-[0.22em] font-bold text-slate-400">Upload File <span className="text-slate-600 font-normal normal-case tracking-normal font-playfair italic">(Max 50MB)</span></label>
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => !loading && fileInputRef.current?.click()}
-                className={`relative border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                className={`relative border border-dashed rounded-md p-5 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
                   loading
-                    ? "opacity-50 cursor-not-allowed border-slate-800"
+                    ? "opacity-50 cursor-not-allowed hairline"
                     : isDragging
-                    ? "border-indigo-500 bg-indigo-950/20 cursor-copy"
+                    ? "border-brass bg-brass/10 cursor-copy"
                     : file
-                    ? "border-emerald-700 bg-emerald-950/10 cursor-pointer"
-                    : "border-slate-700 hover:border-indigo-600 bg-slate-950/40 hover:bg-indigo-950/10 cursor-pointer"
+                    ? "border-emerald-700 bg-emerald-950/20 cursor-pointer"
+                    : "hairline hover:border-brass/50 bg-void hover:bg-void/80 cursor-pointer"
                 }`}
               >
                 {file ? (
@@ -362,13 +366,13 @@ export default function AdminContentPage() {
             <button
               type="submit"
               disabled={loading || !file}
-              className={`w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-indigo-500/20 ${
+              className={`w-full bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment font-bold py-3 rounded-md text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-red-900/20 ${
                 loading || !file ? "cursor-not-allowed opacity-50" : "cursor-pointer"
               }`}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 animate-spin text-brass" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
@@ -383,24 +387,24 @@ export default function AdminContentPage() {
 
         {/* Materials Catalog */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div className="bg-obsidian border hairline rounded-xl overflow-hidden shadow-xl">
             {/* Catalog Header with View Toggle */}
-            <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/30 flex justify-between items-center">
+            <div className="px-6 py-4 border-b hairline-w bg-void/50 flex justify-between items-center">
               <div>
-                <div className="text-sm font-bold text-slate-200">Published Catalog</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">{materials.length} item{materials.length !== 1 ? "s" : ""} published</div>
+                <div className="text-[10px] uppercase tracking-[0.22em] font-bold text-slate-400">Published Catalog</div>
+                <div className="text-[10px] text-slate-500 mt-0.5 font-playfair italic">{materials.length} item{materials.length !== 1 ? "s" : ""} published</div>
               </div>
               <div className="flex items-center gap-2">
                 {/* Grid/List Toggle */}
-                <div className="flex items-center bg-slate-800 rounded-lg p-0.5 gap-0.5">
+                <div className="flex items-center bg-void border hairline rounded-md p-0.5 gap-0.5">
                   {(["grid", "list"] as ViewMode[]).map((mode) => (
                     <button
                       key={mode}
                       onClick={() => setViewMode(mode)}
-                      className={`px-2.5 py-1.5 rounded-md transition-all cursor-pointer ${
+                      className={`px-2.5 py-1.5 rounded transition-all cursor-pointer ${
                         viewMode === mode
-                          ? "bg-indigo-600 text-white"
-                          : "text-slate-400 hover:text-slate-200"
+                          ? "bg-obsidian border hairline text-brass"
+                          : "text-slate-500 hover:text-slate-300"
                       }`}
                     >
                       {mode === "grid" ? (
@@ -435,35 +439,35 @@ export default function AdminContentPage() {
                   {materials.map((m) => (
                     <div
                       key={m.id}
-                      className="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-slate-700 transition-all duration-200 flex flex-col gap-3"
+                      className="bg-void border hairline rounded-xl p-4 hover:-translate-y-1 hover:shadow-xl hover:border-brass/50 transition-all duration-200 flex flex-col gap-3 group relative overflow-hidden"
                     >
                       {/* Card Top */}
-                      <div className="flex items-start gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${TYPE_ICON_BG[m.type]}`}>
+                      <div className="flex items-start gap-3 relative z-10">
+                        <div className={`w-10 h-10 rounded border hairline flex items-center justify-center shrink-0 ${TYPE_ICON_BG[m.type]}`}>
                           <TypeIcon type={m.type} />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="text-sm font-bold text-slate-200 line-clamp-1 leading-snug">{m.title}</h3>
+                            <h3 className="text-sm font-bold text-parchment line-clamp-1 leading-snug font-cinzel tracking-wider">{m.title}</h3>
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase shrink-0 ${TYPE_STYLES[m.type]}`}>
                               {m.type}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">
+                          <p className="text-[10px] text-slate-500 mt-1 line-clamp-2 leading-relaxed font-playfair italic">
                             {m.description || "No description provided."}
                           </p>
                         </div>
                       </div>
                       {/* Card Footer */}
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-800/60">
-                        <span className="text-[10px] text-slate-600 font-mono">
+                      <div className="flex items-center justify-between pt-3 border-t hairline-w relative z-10">
+                        <span className="text-[9px] uppercase tracking-widest text-slate-600 font-bold">
                           {new Date(m.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                         </span>
                         <a
                           href={m.file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest bg-obsidian border hairline hover:border-brass/50 text-brass hover:text-parchment px-2.5 py-1.5 rounded-md font-bold transition-all cursor-pointer"
                         >
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -478,41 +482,41 @@ export default function AdminContentPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse text-left">
                     <thead>
-                      <tr className="border-b border-slate-800 text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                        <th className="px-4 py-3">Title / Course</th>
-                        <th className="px-4 py-3">Type</th>
-                        <th className="px-4 py-3">Date Published</th>
-                        <th className="px-4 py-3 text-right">Preview</th>
+                      <tr className="border-b hairline-w text-[9px] uppercase tracking-widest text-slate-500 font-bold">
+                        <th className="px-6 py-4">Title / Course</th>
+                        <th className="px-6 py-4">Type</th>
+                        <th className="px-6 py-4">Date Published</th>
+                        <th className="px-6 py-4 text-right">Preview</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 text-xs text-slate-300">
+                    <tbody className="divide-y hairline-w text-xs text-slate-300">
                       {materials.map((m) => (
-                        <tr key={m.id} className="hover:bg-slate-800/20 transition-colors">
-                          <td className="px-4 py-4">
+                        <tr key={m.id} className="hover:bg-void transition-colors group">
+                          <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${TYPE_ICON_BG[m.type]}`}>
+                              <div className={`w-8 h-8 rounded border hairline flex items-center justify-center shrink-0 ${TYPE_ICON_BG[m.type]}`}>
                                 <TypeIcon type={m.type} size="sm" />
                               </div>
                               <div>
-                                <div className="font-semibold text-slate-200">{m.title}</div>
-                                <div className="text-slate-500 text-[10px] mt-0.5 line-clamp-1">{m.description || "No description."}</div>
+                                <div className="font-bold text-parchment font-cinzel tracking-wider group-hover:text-brass transition-colors">{m.title}</div>
+                                <div className="text-slate-500 text-[10px] mt-0.5 line-clamp-1 font-playfair italic">{m.description || "No description."}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${TYPE_STYLES[m.type]}`}>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest ${TYPE_STYLES[m.type]}`}>
                               {m.type}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-slate-400 font-mono text-[10px]">
+                          <td className="px-6 py-4 text-slate-400 font-mono text-[10px]">
                             {new Date(m.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                           </td>
-                          <td className="px-4 py-4 text-right">
+                          <td className="px-6 py-4 text-right">
                             <a
                               href={m.file_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg font-bold transition-all"
+                              className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest bg-obsidian border hairline hover:border-brass/50 text-brass px-3 py-1.5 rounded-md font-bold transition-all"
                             >
                               Download
                             </a>

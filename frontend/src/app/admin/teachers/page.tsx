@@ -51,7 +51,7 @@ function AvatarInitials({ teacher }: { teacher: Teacher }) {
     : teacher.email.charAt(0).toUpperCase();
   return (
     <div
-      className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ring-2 shrink-0 ${cfg.avatarBg} ${cfg.avatarRing}`}
+      className={`w-10 h-10 rounded border hairline flex items-center justify-center font-cinzel text-sm font-bold shrink-0 ${cfg.avatarBg}`}
     >
       {initials}
     </div>
@@ -180,16 +180,16 @@ export default function AdminTeachersPage() {
     <div className="space-y-8 max-w-6xl">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 border-b hairline-w pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100">Teacher Roster</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 className="text-3xl font-cinzel font-bold text-parchment tracking-[0.1em] uppercase">Teacher Roster</h1>
+          <p className="text-slate-400 text-sm mt-1.5 font-playfair italic">
             Bulk-invite educators, audit registration status, and coordinate account verification rules.
           </p>
         </div>
         <button
           onClick={() => setShowInviteModal(true)}
-          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all duration-200 cursor-pointer shrink-0"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment text-xs uppercase tracking-widest font-bold px-5 py-2.5 rounded-md shadow-lg shadow-red-900/20 transition-all duration-200 cursor-pointer shrink-0"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -209,32 +209,34 @@ export default function AdminTeachersPage() {
       {/* Stat Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total Enrolled", value: loading ? "—" : stats.total, color: "text-indigo-400", bg: "bg-indigo-950/30 border-indigo-900/40" },
-          { label: "Active", value: loading ? "—" : stats.active, color: "text-emerald-400", bg: "bg-emerald-950/30 border-emerald-900/40" },
-          { label: "Pending", value: loading ? "—" : stats.pending, color: "text-amber-400", bg: "bg-amber-950/30 border-amber-900/40" },
-          { label: "Suspended", value: loading ? "—" : stats.suspended, color: "text-red-400", bg: "bg-red-950/30 border-red-900/40" },
+          { label: "Total Enrolled", value: loading ? "—" : stats.total, color: "text-brass" },
+          { label: "Active", value: loading ? "—" : stats.active, color: "text-emerald-400" },
+          { label: "Pending", value: loading ? "—" : stats.pending, color: "text-amber-400" },
+          { label: "Suspended", value: loading ? "—" : stats.suspended, color: "text-red-400" },
         ].map((s) => (
-          <div key={s.label} className={`rounded-2xl border p-4 shadow-lg ${s.bg}`}>
-            <div className={`text-4xl font-black ${s.color} ${loading ? "animate-pulse" : ""}`}>{s.value}</div>
-            <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">{s.label}</div>
+          <div key={s.label} className="bg-obsidian border hairline rounded-xl p-4 shadow-md">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold mb-2">{s.label}</p>
+            <p className={`text-3xl font-cinzel font-bold ${s.color} ${loading ? "animate-pulse" : ""}`}>{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Invite Modal */}
       {showInviteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-void/90 backdrop-blur-sm p-4 animate-slate-reveal">
+          <div className="w-full max-w-lg bg-obsidian border hairline rounded-xl shadow-2xl overflow-hidden relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+            
             {/* Modal Header */}
-            <div className="px-6 pt-6 pb-4 border-b border-slate-800">
-              <div className="flex justify-between items-center">
+            <div className="px-6 pt-6 pb-4 border-b hairline-w relative z-10">
+              <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-lg font-extrabold text-slate-100">Invite Educators</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Send 72-hour activation links to new teaching staff</p>
+                  <h2 className="text-lg font-cinzel font-bold text-parchment tracking-[0.1em] uppercase">Invite Educators</h2>
+                  <p className="text-[10px] text-slate-500 mt-1 font-playfair italic">Send 72-hour activation links to new teaching staff</p>
                 </div>
                 <button
                   onClick={closeModal}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                  className="w-8 h-8 flex items-center justify-center rounded border hairline text-slate-400 hover:text-brass transition-colors cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -243,13 +245,13 @@ export default function AdminTeachersPage() {
               </div>
 
               {/* Step Indicator */}
-              <div className="flex items-center gap-2 mt-4">
+              <div className="flex items-center gap-2 mt-4 relative z-10">
                 {[{ n: 1, label: "Enter Emails" }, { n: 2, label: "Confirmed" }].map((step, i) => (
                   <React.Fragment key={step.n}>
                     <div className="flex items-center gap-1.5">
                       <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                          inviteStep >= step.n ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-500"
+                        className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold transition-all border hairline ${
+                          inviteStep >= step.n ? "bg-brass text-void border-brass" : "bg-obsidian text-slate-500"
                         }`}
                       >
                         {inviteStep > step.n ? (
@@ -260,18 +262,18 @@ export default function AdminTeachersPage() {
                           step.n
                         )}
                       </div>
-                      <span className={`text-[10px] font-semibold ${inviteStep >= step.n ? "text-slate-300" : "text-slate-600"}`}>
+                      <span className={`text-[9px] uppercase tracking-widest font-semibold ${inviteStep >= step.n ? "text-brass" : "text-slate-600"}`}>
                         {step.label}
                       </span>
                     </div>
-                    {i < 1 && <div className={`flex-1 h-px ${inviteStep > 1 ? "bg-indigo-600" : "bg-slate-800"}`} />}
+                    {i < 1 && <div className={`flex-1 h-px ${inviteStep > 1 ? "bg-brass" : "bg-void border-b hairline-w"}`} />}
                   </React.Fragment>
                 ))}
               </div>
             </div>
 
             {/* Modal Body */}
-            <div className="p-6">
+            <div className="p-6 relative z-10">
               {inviteStep === 2 && inviteStatus?.startsWith("Success") ? (
                 <div className="text-center py-6 space-y-4">
                   <div className="w-14 h-14 rounded-full bg-emerald-950/60 border border-emerald-900/60 flex items-center justify-center mx-auto">
@@ -280,23 +282,23 @@ export default function AdminTeachersPage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-slate-200 font-bold text-sm">{inviteStatus.replace("Success: ", "")}</p>
-                    <p className="text-slate-500 text-xs mt-1">Teachers will receive activation links via email.</p>
+                    <p className="text-parchment font-cinzel font-bold text-sm tracking-widest uppercase">{inviteStatus.replace("Success: ", "")}</p>
+                    <p className="text-slate-500 text-xs mt-2 font-playfair italic">Teachers will receive activation links via email.</p>
                   </div>
                 </div>
               ) : (
                 <form onSubmit={handleBulkInvite} className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300">Email Addresses</label>
-                    <p className="text-[10px] text-slate-600">Separated by commas, spaces, or newlines</p>
+                    <label className="text-[10px] uppercase tracking-[0.22em] font-bold text-slate-400">Email Addresses</label>
+                    <p className="text-[10px] font-playfair italic text-slate-500 pb-1">Separated by commas, spaces, or newlines</p>
                     <textarea
                       rows={5}
                       value={inviteInput}
                       onChange={(e) => setInviteInput(e.target.value)}
                       placeholder={"teacher.one@school.edu\nteacher.two@school.edu, teacher.three@school.edu"}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 placeholder:text-slate-700 text-xs focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+                      className="field w-full bg-void border hairline rounded-md p-3 text-parchment placeholder:text-slate-700 text-xs focus:outline-none focus:border-brass/50 transition-colors resize-none font-mono"
                     />
-                    <p className="text-[10px] text-slate-600">
+                    <p className="text-[10px] text-brass uppercase font-bold tracking-widest pt-1">
                       {inviteInput.split(/[\s,\n]+/).filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)).length} valid email(s) detected
                     </p>
                   </div>
@@ -307,18 +309,18 @@ export default function AdminTeachersPage() {
                     </div>
                   )}
 
-                  <div className="flex justify-end gap-3 pt-1">
+                  <div className="flex justify-end gap-3 pt-4 border-t hairline-w mt-6">
                     <button
                       type="button"
                       onClick={closeModal}
-                      className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer transition-all"
+                      className="px-4 py-2 rounded-md border hairline text-xs text-brass hover:border-brass/50 transition-all cursor-pointer uppercase tracking-widest font-bold"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={inviting}
-                      className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 px-5 py-2 rounded-md bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment text-[10px] uppercase tracking-widest font-bold cursor-pointer transition-all shadow-lg shadow-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {inviting ? (
                         <>
@@ -339,13 +341,13 @@ export default function AdminTeachersPage() {
         </div>
       )}
 
-      {/* Roster Table */}
-      <div className="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      {/* Roster Grid */}
+      <div>
         {/* Toolbar */}
-        <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/30 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
           <div>
-            <div className="text-sm font-bold text-slate-200">Educators Registered</div>
-            <div className="text-[11px] text-slate-500 mt-0.5">{filteredTeachers.length} of {teachers.length} shown</div>
+            <div className="text-[10px] uppercase tracking-[0.22em] font-bold text-slate-400">Educators Registered</div>
+            <div className="text-[10px] text-slate-600 mt-0.5 font-playfair italic">{filteredTeachers.length} of {teachers.length} shown</div>
           </div>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -356,103 +358,95 @@ export default function AdminTeachersPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name, email, ID..."
-              className="bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-4 py-2 text-slate-200 placeholder:text-slate-600 text-xs focus:outline-none focus:border-indigo-500 transition-colors w-64"
+              className="field bg-void border hairline rounded-md pl-8 pr-4 py-2 text-parchment placeholder:text-slate-600 text-xs focus:outline-none focus:border-brass/50 transition-colors w-64"
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div>
           {loading ? (
-            /* Skeleton rows */
-            <div className="divide-y divide-slate-800/60">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="px-6 py-4 flex items-center gap-3 animate-pulse">
-                  <div className="w-9 h-9 rounded-full bg-slate-800 shrink-0" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3 w-32 bg-slate-800 rounded" />
-                    <div className="h-2 w-44 bg-slate-900 rounded" />
+            /* Skeleton grid */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="bg-obsidian border hairline rounded-xl p-6 flex flex-col gap-4 animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded bg-void border hairline shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 w-24 bg-void border hairline rounded" />
+                      <div className="h-2 w-32 bg-void border hairline rounded" />
+                    </div>
                   </div>
-                  <div className="h-4 w-20 bg-slate-800 rounded-full" />
+                  <div className="h-4 w-20 bg-void border hairline rounded-full mt-2" />
                 </div>
               ))}
             </div>
           ) : filteredTeachers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-              <div className="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <p className="text-slate-300 font-semibold text-sm">
+            <div className="bg-obsidian border hairline rounded-xl flex flex-col items-center justify-center py-20 text-center px-6">
+              <span className="text-4xl text-brass mb-4 opacity-50">👥</span>
+              <p className="text-parchment font-cinzel font-bold text-lg tracking-[0.1em] uppercase">
                 {searchQuery ? "No educators match your search" : "No educators enrolled yet"}
               </p>
-              <p className="text-slate-600 text-xs mt-1">
+              <p className="text-slate-500 text-xs mt-2 font-playfair italic">
                 {searchQuery ? "Try adjusting your search terms." : "Click 'Invite Educators' to onboard your first teacher."}
               </p>
               {!searchQuery && (
                 <button
                   onClick={() => setShowInviteModal(true)}
-                  className="mt-4 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all cursor-pointer"
+                  className="mt-6 px-5 py-2.5 rounded-md bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment text-xs font-bold uppercase tracking-widest transition-all cursor-pointer shadow-lg shadow-red-900/20"
                 >
                   Invite Educators
                 </button>
               )}
             </div>
           ) : (
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="border-b border-slate-800 text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                  <th className="px-6 py-3.5">Educator</th>
-                  <th className="px-6 py-3.5">Employee ID</th>
-                  <th className="px-6 py-3.5">Joined</th>
-                  <th className="px-6 py-3.5">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {filteredTeachers.map((teacher) => {
-                  const cfg = STATUS_CONFIG[teacher.status];
-                  return (
-                    <tr key={teacher.id} className="hover:bg-slate-800/20 transition-colors">
-                      {/* Educator cell */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <AvatarInitials teacher={teacher} />
-                          <div>
-                            <div className="text-sm font-semibold text-slate-200">
-                              {teacher.first_name || teacher.last_name
-                                ? `${teacher.first_name} ${teacher.last_name}`.trim()
-                                : <span className="text-slate-500 italic font-normal text-xs">Awaiting registration</span>}
-                            </div>
-                            <div className="text-[11px] text-slate-500 mt-0.5">{teacher.email}</div>
-                          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {filteredTeachers.map((teacher) => {
+                const cfg = STATUS_CONFIG[teacher.status];
+                return (
+                  <div key={teacher.id} className="bg-obsidian border hairline rounded-xl p-6 flex flex-col gap-4 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+                    
+                    <div className="relative z-10 flex items-start gap-3">
+                      <AvatarInitials teacher={teacher} />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-bold text-parchment font-cinzel tracking-wider truncate">
+                          {teacher.first_name || teacher.last_name
+                            ? `${teacher.first_name} ${teacher.last_name}`.trim()
+                            : <span className="text-slate-500 italic font-playfair font-normal text-xs">Awaiting registration</span>}
                         </div>
-                      </td>
-                      {/* Employee ID */}
-                      <td className="px-6 py-4">
-                        <span className="font-mono text-[11px] text-slate-400 bg-slate-800/50 px-2 py-0.5 rounded">
+                        <div className="text-[10px] font-mono text-slate-500 mt-0.5 truncate">{teacher.email}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="relative z-10 grid grid-cols-2 gap-3 pt-4 border-t hairline-w mt-2">
+                      <div>
+                        <div className="text-[9px] uppercase tracking-[0.22em] font-bold text-slate-600 mb-1">Employee ID</div>
+                        <div className="font-mono text-[10px] text-brass">
                           {teacher.employee_id || <span className="text-slate-600">—</span>}
-                        </span>
-                      </td>
-                      {/* Joined date */}
-                      <td className="px-6 py-4 text-xs text-slate-400">
-                        {new Date(teacher.created_at).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </td>
-                      {/* Status Badge */}
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold ${cfg.badge}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                          {cfg.label}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[9px] uppercase tracking-[0.22em] font-bold text-slate-600 mb-1">Joined</div>
+                        <div className="text-[10px] text-slate-400 font-playfair italic">
+                          {new Date(teacher.created_at).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="relative z-10 mt-auto pt-2">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${cfg.badge}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                        {cfg.label}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>

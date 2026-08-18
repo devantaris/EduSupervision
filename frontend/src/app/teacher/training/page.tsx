@@ -42,39 +42,38 @@ const TYPE_ICON: Record<Material["type"], React.ReactNode> = {
 };
 
 const TYPE_BG: Record<Material["type"], string> = {
-  video: "bg-emerald-950/50 text-emerald-400",
-  pdf: "bg-amber-950/50 text-amber-400",
-  document: "bg-slate-800 text-slate-400",
+  video: "bg-obsidian text-brass",
+  pdf: "bg-void text-parchment",
+  document: "bg-void text-parchment",
 };
 
 const TYPE_BADGE: Record<Material["type"], string> = {
-  video: "bg-emerald-900/40 text-emerald-400 border border-emerald-800/60",
-  pdf: "bg-amber-900/40 text-amber-400 border border-amber-800/60",
-  document: "bg-slate-800 text-slate-300 border border-slate-700",
+  video: "bg-void text-brass border hairline",
+  pdf: "bg-obsidian text-slate-300 border hairline",
+  document: "bg-obsidian text-slate-300 border hairline",
 };
 
 function getProgressPercent(m: Material): number {
   if (!m.progress || m.progress.completed) return m.progress?.completed ? 100 : 0;
-  // position is seconds watched; estimate from position (rough approximation without duration)
   return Math.min(Math.round(m.progress.position % 100), 99);
 }
 
 function SkeletonCard() {
   return (
-    <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 space-y-4 animate-pulse">
-      <div className="flex items-start justify-between gap-2">
-        <div className="w-10 h-10 rounded-xl bg-slate-800" />
-        <div className="w-16 h-5 rounded-full bg-slate-800" />
+    <div className="bg-obsidian border hairline rounded-xl p-6 space-y-5 animate-pulse">
+      <div className="flex items-start justify-between gap-3">
+        <div className="w-12 h-12 rounded-xl bg-void border hairline" />
+        <div className="w-20 h-5 rounded-full bg-void border hairline" />
       </div>
-      <div className="space-y-2">
-        <div className="h-4 bg-slate-800 rounded w-3/4" />
-        <div className="h-3 bg-slate-800 rounded w-full" />
-        <div className="h-3 bg-slate-800 rounded w-2/3" />
+      <div className="space-y-3">
+        <div className="h-5 bg-void rounded w-3/4" />
+        <div className="h-3 bg-void rounded w-full" />
+        <div className="h-3 bg-void rounded w-2/3" />
       </div>
-      <div className="h-1.5 bg-slate-800 rounded-full" />
-      <div className="flex justify-between items-center pt-1">
-        <div className="h-3 w-16 bg-slate-800 rounded" />
-        <div className="h-7 w-24 bg-slate-800 rounded-lg" />
+      <div className="h-1 bg-void rounded-full" />
+      <div className="flex justify-between items-center pt-2 border-t hairline">
+        <div className="h-3 w-16 bg-void rounded" />
+        <div className="h-8 w-24 bg-void rounded-md" />
       </div>
     </div>
   );
@@ -129,25 +128,24 @@ export default function TeacherTrainingPage() {
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b hairline pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100">Training Library</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 className="font-cinzel text-3xl uppercase tracking-widest text-parchment">Training Library</h1>
+          <p className="font-jakarta text-slate-400 text-sm mt-2">
             Review curriculum documents, stream pedagogical instructional videos, and track your completion status.
           </p>
         </div>
 
-        {/* Mini progress stat */}
         {!loading && materials.length > 0 && (
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-4 shrink-0 bg-obsidian border hairline p-4 rounded-xl">
             <div className="text-right">
-              <div className="text-xs text-slate-400">
-                <span className="text-emerald-400 font-bold">{completedCount}</span> completed,{" "}
-                <span className="text-indigo-400 font-bold">{inProgressCount}</span> in progress
+              <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">
+                <span className="text-emerald-400">{completedCount}</span> COMPLETED ·{" "}
+                <span className="text-brass">{inProgressCount}</span> IN PROGRESS
               </div>
-              <div className="w-40 h-1.5 bg-slate-800 rounded-full mt-1.5 overflow-hidden">
+              <div className="w-48 h-1.5 bg-void border hairline rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-burgundy to-brass rounded-full transition-all duration-1000"
                   style={{ width: materials.length > 0 ? `${Math.round((completedCount / materials.length) * 100)}%` : "0%" }}
                 />
               </div>
@@ -157,7 +155,7 @@ export default function TeacherTrainingPage() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-2 bg-obsidian border hairline rounded-md p-1 w-fit">
         {FILTER_TABS.map((tab) => {
           const count =
             tab.id === "all"
@@ -171,17 +169,17 @@ export default function TeacherTrainingPage() {
             <button
               key={tab.id}
               onClick={() => setActiveFilter(tab.id)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded text-[10px] uppercase tracking-widest font-semibold transition-all duration-200 cursor-pointer ${
                 activeFilter === tab.id
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  ? "bg-void text-brass border hairline shadow-sm"
+                  : "text-slate-500 border border-transparent hover:text-parchment hover:bg-void/50"
               }`}
             >
               {tab.label}
               {!loading && (
                 <span
-                  className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                    activeFilter === tab.id ? "bg-indigo-500/50 text-indigo-100" : "bg-slate-800 text-slate-500"
+                  className={`text-[8px] font-black px-1.5 py-0.5 rounded-sm ${
+                    activeFilter === tab.id ? "bg-obsidian text-brass border hairline" : "bg-void text-slate-600 border hairline"
                   }`}
                 >
                   {count}
@@ -200,28 +198,28 @@ export default function TeacherTrainingPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
+        <div className="flex flex-col items-center justify-center py-24 text-center bg-obsidian border hairline rounded-xl">
+          <div className="w-16 h-16 rounded-xl bg-void border hairline flex items-center justify-center mb-6">
             <svg className="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
             </svg>
           </div>
-          <p className="text-slate-300 font-bold text-sm">
+          <h3 className="font-cinzel text-lg text-parchment tracking-widest uppercase mb-2">
             {activeFilter === "all"
-              ? "No training courses have been published yet."
-              : `No ${activeFilter === "completed" ? "completed" : activeFilter} courses yet.`}
-          </p>
-          <p className="text-slate-600 text-xs mt-1">
+              ? "No training courses published"
+              : `No ${activeFilter === "completed" ? "completed" : activeFilter} courses yet`}
+          </h3>
+          <p className="font-jakarta text-slate-500 text-sm max-w-md leading-relaxed">
             {activeFilter === "all"
-              ? "Your administrator will publish materials soon. Check back later!"
+              ? "Your administrator will publish pedagogical materials soon. Check back later for updates."
               : `Try switching to a different filter to see available content.`}
           </p>
           {activeFilter !== "all" && (
             <button
               onClick={() => setActiveFilter("all")}
-              className="mt-4 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all cursor-pointer"
+              className="mt-6 px-5 py-2.5 rounded-md bg-void border hairline hover:border-brass/50 text-brass text-[10px] uppercase tracking-widest font-semibold transition-all cursor-pointer"
             >
-              View All Materials
+              VIEW ALL MATERIALS
             </button>
           )}
         </div>
@@ -235,27 +233,27 @@ export default function TeacherTrainingPage() {
             return (
               <div
                 key={m.id}
-                className="group relative bg-slate-900/40 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-200"
+                className="group relative bg-obsidian border hairline hover:border-brass/40 rounded-xl p-6 flex flex-col justify-between hover:shadow-[0_0_20px_rgba(197,163,103,0.05)] transition-all duration-300"
               >
                 {/* Completed Overlay Badge */}
                 {isCompleted && (
-                  <div className="absolute top-3 right-3">
-                    <div className="w-7 h-7 rounded-full bg-emerald-950/80 border border-emerald-800 flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="w-8 h-8 rounded-full bg-void border hairline border-emerald-900/50 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                   </div>
                 )}
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Top Row: Icon + Type badge */}
-                  <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110 ${TYPE_BG[m.type]}`}>
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-xl border hairline flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 ${TYPE_BG[m.type]}`}>
                       {TYPE_ICON[m.type]}
                     </div>
-                    <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <span className={`inline-flex items-center self-start px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${TYPE_BADGE[m.type]}`}>
+                    <div className="flex flex-col gap-1.5 flex-1 min-w-0 pt-1">
+                      <span className={`inline-flex items-center self-start px-2.5 py-1 rounded-sm text-[8px] font-black uppercase tracking-[0.22em] ${TYPE_BADGE[m.type]}`}>
                         {m.type}
                       </span>
                     </div>
@@ -263,26 +261,26 @@ export default function TeacherTrainingPage() {
 
                   {/* Title & Description */}
                   <div>
-                    <h3 className="text-sm font-bold text-slate-200 line-clamp-2 leading-snug pr-6">{m.title}</h3>
-                    <p className="text-[11px] text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+                    <h3 className="font-playfair text-base font-semibold text-parchment line-clamp-2 leading-snug pr-8">{m.title}</h3>
+                    <p className="font-jakarta text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
                       {m.description || "No course description provided."}
                     </p>
                   </div>
 
                   {/* Progress Bar */}
                   {(isInProgress || isCompleted) && (
-                    <div className="space-y-1">
+                    <div className="space-y-2 pt-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">
+                        <span className="text-[8px] text-slate-500 uppercase tracking-widest font-bold">
                           {isCompleted ? "Completed" : "In Progress"}
                         </span>
-                        <span className={`text-[9px] font-bold ${isCompleted ? "text-emerald-400" : "text-indigo-400"}`}>
+                        <span className={`text-[9px] font-bold ${isCompleted ? "text-emerald-400" : "text-brass"}`}>
                           {isCompleted ? "100%" : `${progressPercent}%`}
                         </span>
                       </div>
-                      <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="w-full h-1 bg-void border hairline rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${isCompleted ? "bg-emerald-500" : "bg-indigo-500"}`}
+                          className={`h-full rounded-full transition-all duration-700 ${isCompleted ? "bg-emerald-500" : "bg-gradient-to-r from-burgundy to-brass"}`}
                           style={{ width: isCompleted ? "100%" : `${progressPercent}%` }}
                         />
                       </div>
@@ -291,21 +289,21 @@ export default function TeacherTrainingPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="border-t border-slate-800/60 pt-4 mt-4 flex justify-between items-center">
-                  <span className="text-[10px] text-slate-600 font-mono">
+                <div className="border-t hairline pt-5 mt-6 flex justify-between items-center">
+                  <span className="text-[10px] uppercase tracking-widest text-slate-600 font-jakarta">
                     {new Date(m.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                   </span>
                   <Link
                     href={`/teacher/training/${m.id}`}
-                    className={`text-xs font-bold px-3.5 py-1.5 rounded-lg border transition-all duration-200 ${
+                    className={`text-[10px] uppercase tracking-[0.22em] font-semibold px-4 py-2 rounded-md transition-all duration-300 border ${
                       isCompleted
-                        ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/60 hover:bg-emerald-950/70"
+                        ? "bg-void text-emerald-400 border-emerald-900/40 hover:bg-obsidian"
                         : isInProgress
-                        ? "bg-indigo-950/50 text-indigo-300 border-indigo-800/60 hover:bg-indigo-950/80"
-                        : "bg-indigo-600 text-white border-transparent hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
+                        ? "bg-void text-brass border-brass/40 hover:bg-obsidian"
+                        : "bg-gradient-to-r from-burgundy to-crimson text-parchment border-brass/30 hover:brightness-110 shadow-[0_0_10px_rgba(153,27,27,0.2)]"
                     }`}
                   >
-                    {isCompleted ? "Review" : isInProgress ? "Continue" : "Open Module"}
+                    {isCompleted ? "REVIEW" : isInProgress ? "CONTINUE" : "OPEN MODULE"}
                   </Link>
                 </div>
               </div>

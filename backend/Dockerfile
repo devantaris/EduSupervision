@@ -17,11 +17,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the rest of the application
 COPY . .
 
-# Make start script executable
-RUN chmod +x start.sh
-
 # Expose FastAPI port
 EXPOSE 8000
 
-# Start command: run migrations, seeding, worker, and server
-CMD ["bash", "start.sh"]
+# Start command: run migrations then start server
+CMD alembic upgrade head && python seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2

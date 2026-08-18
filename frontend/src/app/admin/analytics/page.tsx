@@ -72,7 +72,7 @@ function StatCard({
   label,
   value,
   sub,
-  color = "text-[#dfc397]",
+  color = "text-brass",
 }: {
   label: string;
   value: string | number;
@@ -80,10 +80,13 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-5">
-      <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">{label}</p>
-      <p className={`text-3xl font-black ${color}`}>{value}</p>
-      {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
+    <div className="bg-obsidian border hairline rounded-xl p-6 shadow-xl relative overflow-hidden group">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+      <div className="relative z-10">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500 font-bold mb-4">{label}</p>
+        <p className={`text-4xl font-cinzel font-bold tracking-wider ${color}`}>{value}</p>
+        {sub && <p className="text-[10px] uppercase tracking-widest text-slate-600 mt-2 font-semibold">{sub}</p>}
+      </div>
     </div>
   );
 }
@@ -115,33 +118,22 @@ function ScoreChip({ score }: { score: number | null }) {
 function ScoreHistogram({ data }: { data: ScoreDistribution[] }) {
   const maxPct = Math.max(...data.map((d) => d.percentage), 1);
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {data.map((d) => (
-        <div key={d.range_label} className="flex items-center gap-3">
-          <span className="text-[10px] font-mono text-slate-600 w-12 shrink-0">{d.range_label}</span>
-          <div className="flex-1 h-5 bg-slate-800/60 rounded overflow-hidden relative">
+        <div key={d.range_label} className="flex items-center gap-4">
+          <span className="text-[10px] font-mono font-bold text-slate-400 w-12 shrink-0">{d.range_label}</span>
+          <div className="flex-1 h-6 bg-void border hairline rounded-md overflow-hidden relative">
             <div
-              className="h-full rounded transition-all duration-1000"
-              style={{
-                width: `${(d.percentage / maxPct) * 100}%`,
-                background:
-                  d.range_label.startsWith("9") || d.range_label.startsWith("8")
-                    ? "#22c55e"
-                    : d.range_label.startsWith("7")
-                    ? "#dfc397"
-                    : d.range_label.startsWith("6")
-                    ? "#f59e0b"
-                    : "#ef4444",
-                opacity: 0.7,
-              }}
+              className="h-full transition-all duration-1000 bg-gradient-to-r from-burgundy to-crimson"
+              style={{ width: `${(d.percentage / maxPct) * 100}%` }}
             />
             {d.count > 0 && (
-              <span className="absolute left-2 top-0 h-full flex items-center text-[9px] font-bold text-slate-300">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-parchment tracking-widest">
                 {d.count}
               </span>
             )}
           </div>
-          <span className="text-[10px] text-slate-600 w-10 text-right">{d.percentage.toFixed(0)}%</span>
+          <span className="text-[10px] font-cinzel text-brass w-10 text-right font-bold">{d.percentage.toFixed(0)}%</span>
         </div>
       ))}
     </div>
@@ -253,12 +245,12 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* ── Header ── */}
-      <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b hairline-w pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#f5f2eb]">Analytics</h1>
-          <p className="text-sm text-slate-500 mt-1">{data.institution_name}</p>
+          <h1 className="text-3xl font-cinzel font-bold text-parchment tracking-[0.1em] uppercase">Analytics</h1>
+          <p className="text-sm text-slate-500 mt-1.5 font-playfair italic">{data.institution_name}</p>
         </div>
-        <p className="text-[10px] font-mono text-slate-700">
+        <p className="text-[10px] font-mono text-slate-600 uppercase tracking-widest border hairline bg-obsidian px-3 py-1.5 rounded-md">
           Generated {new Date(data.generated_at).toLocaleString()}
         </p>
       </header>
@@ -331,99 +323,76 @@ export default function AdminAnalyticsPage() {
       {tab === "overview" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Score Distribution */}
-          <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">
-              Score Distribution
-            </h2>
-            {data.evaluated_submissions === 0 ? (
-              <p className="text-xs text-slate-600 py-8 text-center">No evaluations yet</p>
-            ) : (
-              <ScoreHistogram data={data.score_distribution} />
-            )}
+          <div className="bg-obsidian border hairline rounded-xl p-6 shadow-md relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+            <div className="relative z-10">
+              <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em] mb-6">
+                Score Distribution
+              </h2>
+              {data.evaluated_submissions === 0 ? (
+                <p className="text-xs text-slate-600 py-8 text-center font-playfair italic">No evaluations yet</p>
+              ) : (
+                <ScoreHistogram data={data.score_distribution} />
+              )}
+            </div>
           </div>
 
           {/* Criterion Gap Analysis */}
-          <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">
+          <div className="bg-obsidian border hairline rounded-xl p-6 shadow-md relative">
+            <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em] mb-1">
               Lowest Scoring Criteria
             </h2>
-            <p className="text-[10px] text-slate-700 mb-5">
+            <p className="text-[10px] text-slate-500 mb-6 font-playfair italic">
               Focus areas for institution-wide professional development
             </p>
             <CriterionGapChart data={data.top_criterion_gaps} />
           </div>
 
-          {/* Submission Status Donut (text-based) */}
-          <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">
-              Submission Pipeline Status
-            </h2>
-            <div className="space-y-3">
-              {[
-                {
-                  label: "Evaluated",
-                  value: data.evaluated_submissions,
-                  color: "#22c55e",
-                  pct:
-                    data.total_submissions
-                      ? (data.evaluated_submissions / data.total_submissions) * 100
-                      : 0,
-                },
-                {
-                  label: "Pending / Processing",
-                  value: data.pending_submissions,
-                  color: "#dfc397",
-                  pct:
-                    data.total_submissions
-                      ? (data.pending_submissions / data.total_submissions) * 100
-                      : 0,
-                },
-                {
-                  label: "Failed",
-                  value: data.failed_submissions,
-                  color: "#ef4444",
-                  pct:
-                    data.total_submissions
-                      ? (data.failed_submissions / data.total_submissions) * 100
-                      : 0,
-                },
-              ].map((s) => (
-                <div key={s.label}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-slate-400">{s.label}</span>
-                    <span className="text-xs font-black" style={{ color: s.color }}>
-                      {s.value}
-                    </span>
-                  </div>
-                  <MiniBar value={s.pct} max={100} color={s.color} />
-                </div>
-              ))}
+          {/* CPD Stepper */}
+          <div className="bg-obsidian border hairline rounded-xl p-6 shadow-md lg:col-span-2 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-brass/5 via-transparent to-transparent pointer-events-none" />
+            <div className="relative z-10">
+              <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.22em] mb-6">
+                CPD Certification Pathway
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {(["Foundation", "Practice", "Advanced", "Expert"] as const).map((stage, idx) => {
+                  const count = data.teacher_summaries.filter(
+                    (t) => t.cpd_stage === stage
+                  ).length;
+                  const isLocked = count === 0;
+                  
+                  return (
+                    <div
+                      key={stage}
+                      className={`relative flex flex-col p-5 rounded-md border hairline ${isLocked ? 'bg-void' : 'bg-void/50'} transition-all`}
+                    >
+                      {idx < 3 && (
+                        <div className="hidden md:block absolute top-1/2 -right-4 w-4 h-px bg-slate-800" />
+                      )}
+                      <div className="flex items-center justify-between mb-4">
+                        <span className={`text-[10px] font-bold uppercase tracking-[0.22em] ${isLocked ? 'text-slate-600' : 'text-brass'}`}>
+                          {stage}
+                        </span>
+                        {isLocked ? (
+                          <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                          </svg>
+                        ) : (
+                          <span className="text-2xl font-cinzel font-bold text-parchment">{count}</span>
+                        )}
+                      </div>
+                      <div className="w-full h-1 bg-obsidian rounded-full overflow-hidden">
+                        <div className={`h-full transition-all duration-500 ${isLocked ? 'w-0' : 'w-full bg-brass'}`} />
+                      </div>
+                      <p className="text-[10px] font-playfair italic text-slate-500 mt-3">
+                        {isLocked ? 'No teachers at this stage' : `${count} teachers certified`}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-
-          {/* CPD Stage Distribution */}
-          <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">
-              CPD Stage Distribution
-            </h2>
-            {(["Expert", "Advanced", "Practice", "Foundation"] as const).map((stage) => {
-              const count = data.teacher_summaries.filter(
-                (t) => t.cpd_stage === stage
-              ).length;
-              const cfg = CPD_STAGE[stage];
-              return (
-                <div
-                  key={stage}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl border mb-2 ${cfg.bg}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span>{cfg.icon}</span>
-                    <span className={`text-sm font-bold ${cfg.color}`}>{stage}</span>
-                  </div>
-                  <span className={`text-2xl font-black ${cfg.color}`}>{count}</span>
-                </div>
-              );
-            })}
           </div>
         </div>
       )}

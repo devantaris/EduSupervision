@@ -70,7 +70,6 @@ function SubmitArea({
     setUploadProgress(0);
 
     try {
-      // Step 1: Get presigned upload URL
       const presignRes = await apiFetch("/api/submissions/presign", {
         method: "POST",
         body: JSON.stringify({
@@ -86,7 +85,6 @@ function SubmitArea({
       const { upload_url, s3_key } = await presignRes.json();
       setUploadProgress(20);
 
-      // Step 2: Upload file directly via XHR (for progress events)
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("PUT", upload_url, true);
@@ -103,7 +101,6 @@ function SubmitArea({
       });
       setUploadProgress(90);
 
-      // Step 3: Confirm submission → triggers AI pipeline
       const confirmRes = await apiFetch("/api/submissions/confirm", {
         method: "POST",
         body: JSON.stringify({
@@ -127,8 +124,8 @@ function SubmitArea({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 space-y-3 border-t border-slate-800/60 pt-4">
-      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Submit Your Work</p>
+    <form onSubmit={handleSubmit} className="mt-4 space-y-4 border-t hairline pt-5">
+      <p className="text-[10px] text-slate-500 uppercase tracking-[0.22em]">Submit Your Work</p>
 
       {/* Drop Zone */}
       <div
@@ -136,34 +133,34 @@ function SubmitArea({
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-all duration-200 ${
+        className={`border-2 border-dashed rounded-xl p-6 flex items-center justify-center flex-col text-center gap-3 cursor-pointer transition-all duration-200 ${
           isDragging
-            ? "border-[#991b1b] bg-[#991b1b]/10"
+            ? "border-brass bg-brass/5"
             : file
             ? "border-emerald-700 bg-emerald-950/10"
-            : "border-slate-700 hover:border-[#991b1b]/50 bg-slate-950/30"
+            : "border-slate-700 hover:border-brass/50 bg-void"
         }`}
       >
         {file ? (
           <>
-            <div className="w-8 h-8 rounded-lg bg-emerald-950/60 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <div>
-              <p className="text-xs font-semibold text-emerald-400 truncate max-w-xs">{file.name}</p>
-              <p className="text-[10px] text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB · click to change</p>
+              <p className="text-sm font-semibold text-emerald-400 truncate max-w-xs">{file.name}</p>
+              <p className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">{(file.size / 1024 / 1024).toFixed(2)} MB · click to change</p>
             </div>
           </>
         ) : (
           <>
-            <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
-              <span className="text-base">📄</span>
+            <div className="w-10 h-10 rounded-lg bg-obsidian border hairline flex items-center justify-center shrink-0">
+              <span className="text-xl">📄</span>
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-400">Drop file here or click to browse</p>
-              <p className="text-[10px] text-slate-600">PDF, DOCX accepted · max 50 MB</p>
+              <p className="text-sm font-semibold text-parchment">Drop file here or click to browse</p>
+              <p className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">PDF, DOCX accepted · max 50 MB</p>
             </div>
           </>
         )}
@@ -178,28 +175,28 @@ function SubmitArea({
 
       {/* Upload progress bar */}
       {uploading && (
-        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-void border hairline rounded-full overflow-hidden">
           <div
-            className="h-full rounded-full bg-[#dfc397] transition-all duration-300"
+            className="h-full rounded-full bg-gradient-to-r from-burgundy to-brass transition-all duration-300"
             style={{ width: `${uploadProgress}%` }}
           />
         </div>
       )}
 
       {error && (
-        <p className="text-xs text-red-400 bg-red-950/30 border border-red-900/40 rounded-lg p-2.5">{error}</p>
+        <p className="text-xs text-red-400 bg-red-950/30 border border-red-900/40 rounded-lg p-3">{error}</p>
       )}
 
       <button
         type="submit"
         disabled={!file || uploading}
-        className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
+        className={`w-full py-3 rounded-md text-[10px] uppercase tracking-[0.22em] font-semibold transition-all duration-200 ${
           !file || uploading
-            ? "bg-slate-800 text-slate-600 cursor-not-allowed"
-            : "bg-[#991b1b] hover:bg-[#881337] text-[#f5f2eb] shadow-lg shadow-[#991b1b]/20 cursor-pointer"
+            ? "bg-obsidian border hairline text-slate-600 cursor-not-allowed"
+            : "bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment shadow-[0_0_15px_rgba(153,27,27,0.4)] cursor-pointer hover:brightness-110"
         }`}
       >
-        {uploading ? `Uploading… ${uploadProgress}%` : "Submit for AI Evaluation"}
+        {uploading ? `UPLOADING… ${uploadProgress}%` : "SUBMIT FOR AI EVALUATION"}
       </button>
     </form>
   );
@@ -228,7 +225,6 @@ export default function TeacherAssignmentsPage() {
       if (subRes.ok) {
         const data = await subRes.json();
         const subs: Submission[] = Array.isArray(data) ? data : data.submissions ?? [];
-        // Map by assignment_id for easy lookup
         const subMap: Record<string, Submission> = {};
         for (const s of subs) subMap[s.assignment_id] = s;
         setMySubmissions(subMap);
@@ -269,9 +265,9 @@ export default function TeacherAssignmentsPage() {
 
   return (
     <div className="space-y-8 max-w-4xl">
-      <header>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-[#f5f2eb]">My Assignments</h1>
-        <p className="text-slate-500 text-sm mt-1">
+      <header className="border-b hairline pb-6">
+        <h1 className="font-cinzel text-3xl uppercase tracking-widest text-parchment">My Submissions</h1>
+        <p className="font-jakarta text-slate-400 text-sm mt-2">
           Submit your work and view detailed AI evaluations across all rubric criteria.
         </p>
       </header>
@@ -279,14 +275,15 @@ export default function TeacherAssignmentsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total", value: stats.total, color: "text-[#dfc397]" },
+          { label: "Total", value: stats.total, color: "text-brass" },
           { label: "Pending", value: stats.pending, color: "text-amber-400" },
           { label: "Submitted", value: stats.submitted, color: "text-blue-400" },
           { label: "Evaluated", value: stats.evaluated, color: "text-emerald-400" },
         ].map((s) => (
-          <div key={s.label} className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4">
-            <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mt-1">{s.label}</p>
+          <div key={s.label} className="bg-obsidian border hairline rounded-xl p-5 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-brass/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <p className={`font-cinzel text-3xl ${s.color}`}>{s.value}</p>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500 mt-2 relative z-10">{s.label}</p>
           </div>
         ))}
       </div>
@@ -295,18 +292,18 @@ export default function TeacherAssignmentsPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-slate-900/30 border border-slate-800/60 rounded-2xl p-5 animate-pulse space-y-3">
-              <div className="h-4 bg-slate-800 rounded w-3/5" />
-              <div className="h-3 bg-slate-800/70 rounded w-full" />
-              <div className="h-3 bg-slate-800/70 rounded w-4/5" />
+            <div key={i} className="bg-obsidian border hairline rounded-xl p-6 animate-pulse space-y-4">
+              <div className="h-5 bg-void border hairline rounded w-3/5" />
+              <div className="h-4 bg-void border hairline rounded w-full" />
+              <div className="h-4 bg-void border hairline rounded w-4/5" />
             </div>
           ))}
         </div>
       ) : assignments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-slate-900/40 border border-slate-800/60 rounded-2xl">
+        <div className="flex flex-col items-center justify-center py-20 bg-obsidian border hairline rounded-xl">
           <span className="text-4xl opacity-20 mb-4">📋</span>
-          <p className="text-slate-400 font-bold text-sm">No assignments yet</p>
-          <p className="text-slate-600 text-xs mt-1">Your administrator will assign tasks soon.</p>
+          <p className="text-parchment font-semibold text-sm">No assignments yet</p>
+          <p className="text-slate-500 text-xs mt-1">Your administrator will assign tasks soon.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -327,33 +324,37 @@ export default function TeacherAssignmentsPage() {
             return (
               <article
                 key={a.id}
-                className="bg-slate-900/40 border border-slate-800/60 rounded-2xl overflow-hidden hover:border-slate-700/60 transition-all duration-200"
+                className="bg-obsidian border hairline rounded-xl overflow-hidden hover:border-brass/30 transition-all duration-300 shadow-lg"
               >
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-4">
+                <div className="p-6">
+                  <div className="flex items-start justify-between gap-6">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold text-[#f5f2eb] leading-snug">{a.title}</h3>
-                      <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">{a.description}</p>
+                      <h3 className="text-lg font-playfair font-semibold text-parchment leading-snug">{a.title}</h3>
+                      <p className="text-sm font-jakarta text-slate-400 mt-2 leading-relaxed">{a.description}</p>
                     </div>
 
                     {isEvaluated && mySub.score_json?.overall_score != null && (
-                      <div className="shrink-0 text-right">
-                        <div className="text-2xl font-black text-emerald-400">
+                      <div className="shrink-0 text-right bg-void border hairline p-3 rounded-lg flex flex-col items-center min-w-[80px]">
+                        <div className="font-cinzel text-3xl text-emerald-400 leading-none">
                           {mySub.score_json.overall_score.toFixed(0)}
                         </div>
-                        <div className="text-[9px] text-slate-600 font-bold uppercase tracking-wider">/ 100 pts</div>
+                        <div className="text-[9px] text-slate-500 uppercase tracking-widest mt-1">/ 100 pts</div>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-4 mt-4 flex-wrap">
-                    <span className={`text-[10px] font-bold ${dueColor}`}>{formatDue(a.due_date)}</span>
-                    <span className="text-[10px] text-slate-600">{a.rubric_criteria.length} rubric criteria</span>
+                  <div className="flex items-center gap-4 mt-6 flex-wrap pt-4 border-t hairline border-dashed">
+                    <span className={`text-[10px] uppercase tracking-widest font-semibold ${dueColor}`}>
+                      🕒 {formatDue(a.due_date)}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-widest text-slate-500">
+                      📑 {a.rubric_criteria.length} criteria
+                    </span>
 
                     {/* Submission status badge */}
                     {mySub && (
                       <span
-                        className={`inline-flex items-center gap-1.5 text-[10px] font-bold ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border hairline bg-void text-[9px] font-bold uppercase tracking-wider ${
                           SUBMISSION_STATUS[mySub.status]?.color ?? "text-slate-400"
                         }`}
                       >
@@ -366,11 +367,11 @@ export default function TeacherAssignmentsPage() {
                       </span>
                     )}
 
-                    <div className="ml-auto flex items-center gap-2">
+                    <div className="ml-auto flex items-center gap-3">
                       {isEvaluated && (
                         <Link
                           href={`/teacher/assignments/${mySub.id}`}
-                          className="text-xs text-[#dfc397] hover:text-[#f5f2eb] font-bold transition-colors"
+                          className="text-[10px] uppercase tracking-[0.22em] text-brass hover:text-parchment font-semibold transition-colors"
                         >
                           View Results →
                         </Link>
@@ -378,13 +379,13 @@ export default function TeacherAssignmentsPage() {
                       {canSubmit && (
                         <button
                           onClick={() => setExpandedId(isExpanded ? null : a.id)}
-                          className={`text-xs font-bold px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                          className={`text-[10px] uppercase tracking-[0.22em] font-semibold px-4 py-2 rounded-md transition-all cursor-pointer ${
                             isExpanded
-                              ? "bg-slate-800 text-slate-300 border-slate-700"
-                              : "bg-[#991b1b] hover:bg-[#881337] text-[#f5f2eb] border-transparent shadow-lg shadow-[#991b1b]/20"
+                              ? "bg-void text-slate-300 border hairline hover:bg-obsidian"
+                              : "bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment shadow-[0_0_10px_rgba(153,27,27,0.3)] hover:brightness-110"
                           }`}
                         >
-                          {isExpanded ? "Cancel" : "Submit Work"}
+                          {isExpanded ? "CANCEL" : "SUBMIT WORK"}
                         </button>
                       )}
                     </div>
@@ -392,7 +393,7 @@ export default function TeacherAssignmentsPage() {
                 </div>
 
                 {isExpanded && canSubmit && (
-                  <div className="px-5 pb-5">
+                  <div className="px-6 pb-6 bg-obsidian">
                     <SubmitArea assignment={a} onSubmitted={handleSubmitted} />
                   </div>
                 )}

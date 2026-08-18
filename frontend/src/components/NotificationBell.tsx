@@ -1,236 +1,230 @@
 "use client";
 
-/**
- * NotificationBell — Real-time notification indicator
- *
- * Connects to the SSE notification stream at /api/notifications/stream.
- * Shows a count badge for unread events.
- * Clicking opens a dropdown with event history.
- *
- * Events handled:
- *   evaluation_complete  → green toast + count increment
- *   similarity_flag      → amber alert
- *   announcement         → blue info
- */
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { tokenStore } from "@/lib/api";
 
 interface NotificationEvent {
   id: string;
-  type: string;
+  type: "evaluation_complete" | "similarity_flag" | "announcement" | "system";
+  title: string;
   message: string;
-  score?: number;
-  timestamp: Date;
+  timestamp: string;
   read: boolean;
 }
 
-function buildMessage(data: Record<string, unknown>): string {
-  switch (data.type) {
-    case "evaluation_complete":
-      return `Evaluation complete — Score: ${Number(data.overall_score ?? 0).toFixed(0)}/100`;
-    case "similarity_flag":
-      return `Similarity flag raised on submission ${String(data.submission_id ?? "").slice(0, 8)}…`;
-    case "announcement":
-      return String(data.message ?? "New announcement");
-    case "connected":
-      return "Connected to notification stream";
-    default:
-      return "New notification received";
-  }
-}
-
 export default function NotificationBell() {
+  const [isOpen, setIsOpen] = useState(false);
   const [events, setEvents] = useState<NotificationEvent[]>([]);
-  const [open, setOpen] = useState(false);
   const [connected, setConnected] = useState(false);
-  const esRef = useRef<EventSource | null>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const unread = events.filter((e) => !e.read).length;
+  const unreadCount = events.filter((e) => !e.read).length;
 
-  // Connect SSE stream
   const connectSSE = useCallback(() => {
-    if (esRef.current) {
-      esRef.current.close();
-    }
+    const token = tokenStore.get();
+    if (!token) return;
 
-    // Get access token from tokenStore for Authorization header
-    // SSE via EventSource doesn't support custom headers natively in browsers.
-    // We use a cookie-based auth fallback — the Next.js route handler forwards
-    // the HttpOnly refresh token and re-authenticates for SSE connections.
     try {
-      const es = new EventSource("/api/notifications/stream", {
-        withCredentials: true,
-      });
-      esRef.current = es;
+      const es = new EventSource(`/api/v1/notifications/stream?token=${token}`);
+      eventSourceRef.current = es;
 
-      es.onopen = () => {
-        setConnected(true);
-      };
+      es.onopen = () => setConnected(true);
 
-      es.onmessage = (evt) => {
+      es.onmessage = (event) => {
         try {
-          const data = JSON.parse(evt.data) as Record<string, unknown>;
-          if (data.type === "connected") {
-            setConnected(true);
-            return;
-          }
-          const notification: NotificationEvent = {
-            id: `${Date.now()}-${Math.random()}`,
-            type: String(data.type ?? "info"),
-            message: buildMessage(data),
-            score: typeof data.overall_score === "number" ? data.overall_score : undefined,
-            timestamp: new Date(),
+          const data = JSON.parse(event.data);
+          if (data.type === "heartbeat") return;
+
+          const newEvent: NotificationEvent = {
+            id: data.id || crypto.randomUUID(),
+            type: data.type || "system",
+            title: data.title || "Notification",
+            message: data.message || "",
+            timestamp: data.timestamp || new Date().toISOString(),
             read: false,
           };
-          setEvents((prev) => [notification, ...prev].slice(0, 50));
+
+          setEvents((prev) => [newEvent, ...prev].slice(0, 50));
         } catch {
-          // Ignore parse errors (heartbeats are comments, not messages)
+          // Ignore unparseable messages (heartbeats)
         }
       };
 
       es.onerror = () => {
         setConnected(false);
         es.close();
-        // Reconnect after 5s
-        setTimeout(connectSSE, 5000);
+        eventSourceRef.current = null;
+        // Reconnect with 5s backoff
+        reconnectTimeoutRef.current = setTimeout(connectSSE, 5000);
       };
     } catch {
-      // SSE not supported or connection refused — silent fail
+      setConnected(false);
     }
   }, []);
 
   useEffect(() => {
     connectSSE();
     return () => {
-      esRef.current?.close();
+      eventSourceRef.current?.close();
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
     };
   }, [connectSSE]);
 
-  // Close panel on outside click
+  // Close on outside click
   useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setOpen(false);
+    function handleClick(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
       }
     }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setIsOpen(false);
+    }
+    document.addEventListener("click", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("click", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
   }, []);
 
   function markAllRead() {
     setEvents((prev) => prev.map((e) => ({ ...e, read: true })));
   }
 
-  function formatTime(d: Date) {
-    return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+  function getEventIcon(type: string) {
+    switch (type) {
+      case "evaluation_complete":
+        return (
+          <div className="w-9 h-9 shrink-0 rounded-md bg-emerald-500/10 border border-emerald-400/20 flex items-center justify-center">
+            <svg className="w-[18px] h-[18px] text-emerald-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+            </svg>
+          </div>
+        );
+      case "similarity_flag":
+        return (
+          <div className="w-9 h-9 shrink-0 rounded-md bg-burgundy/25 border border-red-500/25 flex items-center justify-center">
+            <svg className="w-[18px] h-[18px] text-red-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+        );
+      case "announcement":
+        return (
+          <div className="w-9 h-9 shrink-0 rounded-md bg-gold/10 border border-gold/25 flex items-center justify-center">
+            <svg className="w-[18px] h-[18px] text-gold" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
+            </svg>
+          </div>
+        );
+      default:
+        return (
+          <div className="w-9 h-9 shrink-0 rounded-md bg-slate-500/10 border border-slate-400/20 flex items-center justify-center">
+            <svg className="w-[18px] h-[18px] text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+          </div>
+        );
+    }
   }
 
-  const typeConfig: Record<string, { dot: string; label: string }> = {
-    evaluation_complete: { dot: "bg-emerald-500", label: "Evaluation" },
-    similarity_flag: { dot: "bg-amber-400", label: "Flag" },
-    announcement: { dot: "bg-blue-400", label: "Notice" },
-    default: { dot: "bg-slate-500", label: "Update" },
-  };
+  function getEventDotColor(type: string) {
+    switch (type) {
+      case "evaluation_complete": return "bg-emerald-400";
+      case "similarity_flag": return "bg-burgundy";
+      case "announcement": return "bg-gold";
+      default: return "bg-slate-400";
+    }
+  }
+
+  function formatTimeAgo(timestamp: string) {
+    const diff = Date.now() - new Date(timestamp).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins} minute${mins > 1 ? "s" : ""} ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    return `${Math.floor(hours / 24)} day${Math.floor(hours / 24) > 1 ? "s" : ""} ago`;
+  }
 
   return (
-    <div className="relative" ref={panelRef}>
-      {/* Bell button */}
+    <div className="relative" ref={wrapRef}>
       <button
-        onClick={() => {
-          setOpen((v) => !v);
-          if (!open) markAllRead();
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+          if (!isOpen) markAllRead();
         }}
-        className="relative w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-800/60 transition-colors cursor-pointer"
-        aria-label="Notifications"
-        id="notification-bell-btn"
+        className="relative w-10 h-10 rounded-md border hairline-w bg-obsidian/80 flex items-center justify-center hover:border-brass/40 transition-colors cursor-pointer"
       >
-        <svg
-          className={`w-5 h-5 transition-colors ${connected ? "text-slate-400" : "text-slate-600"}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-          />
+        <svg className="w-5 h-5 text-brass" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
         </svg>
-        {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-[#991b1b] text-[#f5f2eb] text-[9px] font-black flex items-center justify-center">
-            {unread > 99 ? "99+" : unread}
+
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-full bg-burgundy text-[10px] font-bold text-white flex items-center justify-center border-2 border-void">
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
+
         {connected && (
-          <span className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span className="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-emerald-400 pulse-dot" title="Live connection" />
         )}
       </button>
 
-      {/* Notification panel */}
-      {open && (
-        <div
-          className="absolute right-0 top-11 w-80 bg-slate-900/95 backdrop-blur-xl border border-slate-800/60 rounded-2xl shadow-2xl z-50 overflow-hidden"
-          style={{ animation: "slideIn 0.15s ease-out" }}
-        >
-          <style>{`
-            @keyframes slideIn {
-              from { opacity: 0; transform: translateY(-8px); }
-              to   { opacity: 1; transform: translateY(0); }
-            }
-          `}</style>
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/60">
+      {/* Dropdown */}
+      {isOpen && (
+        <div className="absolute right-0 mt-3 w-[380px] rounded-lg border hairline bg-obsidian shadow-[0_12px_40px_-12px_rgba(0,0,0,0.7)] overflow-hidden z-50">
+          <div className="px-4 py-3 border-b hairline flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#f5f2eb]">Notifications</span>
-              {!connected && (
-                <span className="text-[9px] text-red-400 font-bold px-1.5 py-0.5 rounded-full bg-red-950/40 border border-red-900/40">
-                  Offline
-                </span>
-              )}
+              <span className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-emerald-400 pulse-dot" : "bg-red-400"}`} />
+              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                Real-Time Feed · {connected ? "Live" : "Reconnecting…"}
+              </p>
             </div>
-            {events.length > 0 && (
-              <button
-                onClick={markAllRead}
-                className="text-[10px] text-slate-600 hover:text-slate-400 cursor-pointer transition-colors"
-              >
-                Mark all read
-              </button>
+            <button
+              onClick={markAllRead}
+              className="text-[11px] text-brass hover:text-gold cursor-pointer"
+            >
+              Mark all read
+            </button>
+          </div>
+
+          <div className="divide-y divide-white/5 max-h-[340px] overflow-y-auto">
+            {events.length === 0 ? (
+              <div className="px-4 py-8 text-center">
+                <p className="text-xs text-slate-500">No notifications yet</p>
+                <p className="text-[10px] text-slate-600 mt-1">Events will appear here in real time</p>
+              </div>
+            ) : (
+              events.map((event) => (
+                <div
+                  key={event.id}
+                  className="flex gap-3 px-4 py-3.5 hover:bg-white/[0.03] transition-colors cursor-pointer"
+                >
+                  {getEventIcon(event.type)}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-parchment font-medium">{event.title}</p>
+                    <p className="text-xs text-slate-400 mt-0.5 truncate">{event.message}</p>
+                    <p className="text-[10px] text-slate-600 mt-1 uppercase tracking-wider">
+                      {formatTimeAgo(event.timestamp)}
+                    </p>
+                  </div>
+                  {!event.read && (
+                    <span className={`ml-auto w-2 h-2 mt-1.5 rounded-full ${getEventDotColor(event.type)} shrink-0`} />
+                  )}
+                </div>
+              ))
             )}
           </div>
 
-          {/* Event list */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-slate-800/40">
-            {events.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 gap-2">
-                <span className="text-2xl opacity-20">🔔</span>
-                <p className="text-xs text-slate-600">No notifications yet</p>
-              </div>
-            ) : (
-              events.map((ev) => {
-                const cfg = typeConfig[ev.type] ?? typeConfig.default;
-                return (
-                  <div
-                    key={ev.id}
-                    className={`px-4 py-3 flex gap-3 ${ev.read ? "opacity-50" : ""}`}
-                  >
-                    <div className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${cfg.dot}`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2 mb-0.5">
-                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-wider">
-                          {cfg.label}
-                        </span>
-                        <span className="text-[9px] text-slate-700">{formatTime(ev.timestamp)}</span>
-                      </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">{ev.message}</p>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+          <div className="px-4 py-2.5 border-t hairline text-center">
+            <button className="text-xs text-brass hover:text-gold font-medium tracking-wide cursor-pointer">
+              View all notifications →
+            </button>
           </div>
         </div>
       )}

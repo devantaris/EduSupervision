@@ -46,41 +46,43 @@ function CPDPathway({
   const stageIdx = STAGES.indexOf(stage as typeof STAGES[number]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-slate-500 font-bold relative">
+        <div className="absolute top-4 left-0 w-full h-px bg-void border-t hairline -z-10" />
         {STAGES.map((s, i) => (
           <div
             key={s}
-            className={`flex flex-col items-center gap-1.5 ${
-              i <= stageIdx ? "opacity-100" : "opacity-30"
+            className={`flex flex-col items-center gap-3 bg-obsidian px-2 ${
+              i <= stageIdx ? "opacity-100" : "opacity-40"
             }`}
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm border-2 ${
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-cinzel text-sm border hairline ${
                 i < stageIdx
-                  ? "bg-emerald-900/60 border-emerald-700 text-emerald-400"
+                  ? "bg-void text-brass border-brass/50"
                   : i === stageIdx
-                  ? "bg-[#991b1b]/30 border-[#991b1b] text-[#dfc397] shadow-lg shadow-[#991b1b]/30"
-                  : "bg-slate-900 border-slate-700 text-slate-600"
+                  ? "bg-gradient-to-r from-burgundy to-crimson text-parchment border-brass shadow-[0_0_10px_rgba(197,163,103,0.3)]"
+                  : "bg-void text-slate-600"
               }`}
             >
               {i < stageIdx ? "✓" : i === stageIdx ? "●" : "○"}
             </div>
-            <span className={i === stageIdx ? "text-[#dfc397]" : ""}>{s}</span>
-            <span className="text-[8px] opacity-60">≥{STAGE_THRESHOLDS[s]}</span>
+            <div className="flex flex-col items-center gap-1">
+              <span className={i === stageIdx ? "text-brass font-bold" : ""}>{s}</span>
+              <span className="text-[8px] tracking-widest opacity-60">≥{STAGE_THRESHOLDS[s]} PTS</span>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Progress bar within current stage */}
-      <div className="space-y-1">
-        <div className="flex justify-between text-[10px] text-slate-600">
-          <span>Progress within {stage}</span>
-          <span>{Math.round(progress * 100)}%</span>
+      <div className="bg-void border hairline p-4 rounded-xl space-y-2">
+        <div className="flex justify-between text-[10px] uppercase tracking-[0.22em] text-slate-400">
+          <span>Stage Progress</span>
+          <span className="text-brass font-bold">{Math.round(progress * 100)}%</span>
         </div>
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-obsidian rounded-full overflow-hidden border hairline">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#991b1b] to-[#dfc397] transition-all duration-1000"
+            className="h-full rounded-full bg-gradient-to-r from-burgundy to-brass transition-all duration-1000"
             style={{ width: `${progress * 100}%` }}
           />
         </div>
@@ -93,12 +95,12 @@ function CPDPathway({
 
 function ScoreTrend({ points }: { points: ScoreTrendPoint[] }) {
   if (!points.length) {
-    return <p className="text-xs text-slate-600 py-8 text-center">Submit assignments to see your trend</p>;
+    return <p className="text-xs font-jakarta text-slate-500 py-8 text-center italic">Submit assignments to generate trend telemetry.</p>;
   }
 
   const width = 500;
-  const height = 100;
-  const pad = 10;
+  const height = 120;
+  const pad = 15;
   const min = Math.max(0, Math.min(...points.map((p) => p.score)) - 10);
   const max = Math.min(100, Math.max(...points.map((p) => p.score)) + 10);
 
@@ -115,33 +117,35 @@ function ScoreTrend({ points }: { points: ScoreTrendPoint[] }) {
     ` L${toX(points.length - 1)},${height} L${toX(0)},${height} Z`;
 
   return (
-    <div className="w-full overflow-hidden rounded-xl bg-slate-950/40 p-2">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="none">
+    <div className="w-full overflow-hidden rounded-xl bg-void border hairline p-4 relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-brass/5 to-transparent pointer-events-none" />
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full relative z-10" preserveAspectRatio="none">
         <defs>
           <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#dfc397" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#dfc397" stopOpacity="0" />
+            <stop offset="0%" stopColor="#c5a367" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#991b1b" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path d={areaD} fill="url(#trendGrad)" />
-        <path d={pathD} fill="none" stroke="#dfc397" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={pathD} fill="none" stroke="#dfc397" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         {points.map((p, i) => (
           <circle
             key={i}
             cx={toX(i)}
             cy={toY(p.score)}
-            r="3"
-            fill="#dfc397"
-            stroke="#070a10"
-            strokeWidth="1.5"
+            r="4"
+            fill="#0c0f16"
+            stroke="#dfc397"
+            strokeWidth="2"
+            className="transition-transform hover:scale-150 cursor-pointer"
           />
         ))}
       </svg>
-      <div className="flex justify-between px-1 mt-1">
-        <span className="text-[9px] text-slate-700">
+      <div className="flex justify-between px-2 mt-3 font-jakarta text-[9px] uppercase tracking-widest text-slate-500">
+        <span>
           {points[0] && new Date(points[0].date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
         </span>
-        <span className="text-[9px] text-slate-700">
+        <span>
           {points[points.length - 1] &&
             new Date(points[points.length - 1].date).toLocaleDateString("en-US", {
               month: "short",
@@ -157,22 +161,22 @@ function ScoreTrend({ points }: { points: ScoreTrendPoint[] }) {
 
 function CriterionBreakdown({ data }: { data: CriterionEntry[] }) {
   if (!data.length)
-    return <p className="text-xs text-slate-600 py-4 text-center">No evaluations yet</p>;
+    return <p className="text-xs font-jakarta text-slate-500 py-6 text-center italic">No evaluation data available.</p>;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {data.map((c) => {
         const color =
-          c.average >= 80 ? "#22c55e" : c.average >= 60 ? "#dfc397" : "#ef4444";
+          c.average >= 80 ? "#c5a367" : c.average >= 60 ? "#dfc397" : "#991b1b";
         return (
-          <div key={c.criterion}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-slate-400 truncate max-w-[220px]">{c.criterion}</span>
-              <span className="text-xs font-black ml-2" style={{ color }}>
+          <div key={c.criterion} className="bg-void border hairline p-4 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-playfair font-semibold text-parchment truncate pr-4">{c.criterion}</span>
+              <span className="text-sm font-cinzel font-black" style={{ color }}>
                 {c.average.toFixed(1)}
               </span>
             </div>
-            <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-1 bg-obsidian rounded-full overflow-hidden border hairline">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{ width: `${c.average}%`, background: color }}
@@ -216,25 +220,25 @@ export default function TeacherAnalyticsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 rounded-full border-2 border-t-[#dfc397] border-[#dfc397]/10 animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-t-brass border-brass/10 animate-spin" />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-red-400 text-sm">{error}</p>
+      <div className="flex flex-col items-center justify-center py-20 bg-obsidian border hairline rounded-xl">
+        <p className="text-crimson font-jakarta text-sm">{error}</p>
       </div>
     );
   }
 
   const scoreColor =
     (data.average_score ?? 0) >= 80
-      ? "text-emerald-400"
+      ? "text-brass"
       : (data.average_score ?? 0) >= 60
-      ? "text-[#dfc397]"
-      : "text-red-400";
+      ? "text-parchment"
+      : "text-crimson";
 
   const trend =
     data.score_trend.length >= 2
@@ -243,93 +247,103 @@ export default function TeacherAnalyticsPage() {
       : null;
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      <header>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-[#f5f2eb]">My Progress</h1>
-        <p className="text-slate-500 text-sm mt-1">
-          Your professional development analytics and CPD certification pathway
+    <div className="space-y-8 max-w-5xl">
+      <header className="border-b hairline pb-6">
+        <h1 className="font-cinzel text-3xl uppercase tracking-widest text-parchment">My Progress</h1>
+        <p className="font-jakarta text-slate-400 text-sm mt-2">
+          Your professional development analytics and CPD certification pathway.
         </p>
       </header>
 
       {/* ── Top KPI strip ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4 col-span-2 sm:col-span-1">
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="bg-obsidian border hairline rounded-xl p-6 col-span-2 md:col-span-1 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-brass/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500 font-bold mb-3 relative z-10">
             Average Score
           </p>
-          <p className={`text-4xl font-black ${scoreColor}`}>
+          <p className={`font-cinzel text-5xl tracking-tight ${scoreColor} relative z-10`}>
             {data.average_score !== null ? data.average_score.toFixed(1) : "—"}
           </p>
           {trend !== null && (
             <p
-              className={`text-xs mt-1 font-semibold ${
-                trend > 0 ? "text-emerald-400" : trend < 0 ? "text-red-400" : "text-slate-500"
+              className={`text-[10px] uppercase tracking-widest mt-2 font-semibold relative z-10 ${
+                trend > 0 ? "text-emerald-400" : trend < 0 ? "text-crimson" : "text-slate-500"
               }`}
             >
-              {trend > 0 ? "↑" : trend < 0 ? "↓" : "→"} {Math.abs(trend).toFixed(1)} vs last
+              {trend > 0 ? "↑" : trend < 0 ? "↓" : "→"} {Math.abs(trend).toFixed(1)} PTS VS LAST
             </p>
           )}
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4">
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">
+        <div className="bg-obsidian border hairline rounded-xl p-6 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-brass/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500 font-bold mb-3 relative z-10">
             Evaluated
           </p>
-          <p className="text-4xl font-black text-emerald-400">{data.evaluated_submissions}</p>
+          <p className="font-cinzel text-5xl tracking-tight text-parchment relative z-10">{data.evaluated_submissions}</p>
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4">
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">
+        <div className="bg-obsidian border hairline rounded-xl p-6 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-brass/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500 font-bold mb-3 relative z-10">
             Training
           </p>
-          <p className="text-4xl font-black text-blue-400">{data.training_completion.toFixed(0)}%</p>
+          <p className="font-cinzel text-5xl tracking-tight text-parchment relative z-10">{data.training_completion.toFixed(0)}%</p>
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4">
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">
+        <div className="bg-obsidian border hairline rounded-xl p-6 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-brass/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500 font-bold mb-3 relative z-10">
             CPD Stage
           </p>
-          <p className="text-2xl font-black text-[#dfc397]">{data.cpd_stage}</p>
+          <p className="font-cinzel text-3xl tracking-wider text-brass mt-2 relative z-10">{data.cpd_stage}</p>
         </div>
       </div>
 
-      {/* ── CPD Pathway ── */}
-      <section className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">
-          CPD Certification Pathway
-        </h2>
-        <CPDPathway stage={data.cpd_stage} progress={data.cpd_stage_progress} />
-      </section>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          {/* ── CPD Pathway ── */}
+          <section className="bg-obsidian border hairline rounded-xl p-8">
+            <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.22em] mb-8 pl-2 border-l-2 border-brass">
+              CPD Certification Pathway
+            </h2>
+            <CPDPathway stage={data.cpd_stage} progress={data.cpd_stage_progress} />
+          </section>
 
-      {/* ── Score Trend ── */}
-      <section className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
-          Score Trend Over Time
-        </h2>
-        <ScoreTrend points={data.score_trend} />
-      </section>
+          {/* ── Score Trend ── */}
+          <section className="bg-obsidian border hairline rounded-xl p-8">
+            <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.22em] mb-6 pl-2 border-l-2 border-brass">
+              Score Trend Over Time
+            </h2>
+            <ScoreTrend points={data.score_trend} />
+          </section>
+        </div>
 
-      {/* ── Criterion Breakdown ── */}
-      <section className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">
-          Criterion Performance
-        </h2>
-        <p className="text-[10px] text-slate-700 mb-5">
-          Sorted weakest first — focus areas for your next submission
-        </p>
-        <CriterionBreakdown data={data.criterion_breakdown} />
-      </section>
+        <div className="space-y-8">
+          {/* ── Criterion Breakdown ── */}
+          <section className="bg-obsidian border hairline rounded-xl p-8 h-full">
+            <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.22em] mb-2 pl-2 border-l-2 border-brass">
+              Criterion Performance
+            </h2>
+            <p className="text-[10px] uppercase tracking-widest text-slate-600 mb-6 pl-3">
+              Sorted weakest first — focus areas
+            </p>
+            <CriterionBreakdown data={data.criterion_breakdown} />
+          </section>
+        </div>
+      </div>
 
       {/* ── AI Recommendations ── */}
       {data.recommendations.filter(Boolean).length > 0 && (
-        <section className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6">
-          <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
-            Latest Recommendations
+        <section className="bg-obsidian border hairline rounded-xl p-8">
+          <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.22em] mb-6 pl-2 border-l-2 border-brass">
+            Strategic Recommendations
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {data.recommendations.filter(Boolean).map((r, i) => (
-              <div key={i} className="flex gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#991b1b]/20 border border-[#991b1b]/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-[9px] font-black text-[#dfc397]">{i + 1}</span>
+              <div key={i} className="flex gap-4 p-5 bg-void border hairline rounded-xl">
+                <div className="w-8 h-8 rounded-full bg-obsidian border hairline flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="font-cinzel text-sm font-bold text-brass">{i + 1}</span>
                 </div>
-                <p className="text-sm text-slate-300 leading-relaxed">{r}</p>
+                <p className="font-jakarta text-sm text-parchment leading-relaxed">{r}</p>
               </div>
             ))}
           </div>

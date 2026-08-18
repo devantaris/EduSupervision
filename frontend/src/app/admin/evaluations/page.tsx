@@ -32,29 +32,29 @@ function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; classes: string; dot: string }> = {
     evaluated: {
       label: "Evaluated",
-      classes: "bg-emerald-950/60 text-emerald-400 border-emerald-900/40",
+      classes: "bg-emerald-950/60 text-emerald-400 border border-emerald-900/60",
       dot: "bg-emerald-500",
     },
     processing: {
       label: "Processing",
-      classes: "bg-blue-950/60 text-blue-400 border-blue-900/40",
-      dot: "bg-blue-400 animate-pulse",
+      classes: "bg-amber-950/60 text-amber-400 border border-amber-900/60",
+      dot: "bg-amber-400 animate-pulse",
     },
     pending: {
       label: "Pending",
-      classes: "bg-amber-950/60 text-amber-400 border-amber-900/40",
-      dot: "bg-amber-400",
+      classes: "bg-void text-slate-400 border hairline",
+      dot: "bg-slate-500",
     },
     failed: {
       label: "Failed",
-      classes: "bg-red-950/60 text-red-400 border-red-900/40",
-      dot: "bg-red-400",
+      classes: "bg-red-950/60 text-red-400 border border-red-900/60",
+      dot: "bg-red-500",
     },
   };
   const b = map[status] ?? map.pending;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider ${b.classes}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${b.classes}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${b.dot}`} />
       {b.label}
@@ -69,13 +69,13 @@ function ScoreMeter({ score }: { score: number }) {
     score >= 80 ? "#22c55e" : score >= 60 ? "#dfc397" : score >= 40 ? "#f59e0b" : "#ef4444";
   return (
     <div className="flex items-center gap-3">
-      <div className="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden">
+      <div className="h-1.5 flex-1 bg-void border hairline rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{ width: `${score}%`, background: color }}
         />
       </div>
-      <span className="text-sm font-black" style={{ color }}>
+      <span className="text-sm font-cinzel font-bold text-brass">
         {score.toFixed(0)}
       </span>
     </div>
@@ -126,9 +126,9 @@ export default function AdminEvaluationsPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* ── Header ── */}
-      <header>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-[#f5f2eb]">Evaluations</h1>
-        <p className="text-sm text-slate-500 mt-1.5">
+      <header className="border-b hairline-w pb-6">
+        <h1 className="text-3xl font-cinzel font-bold text-parchment tracking-[0.1em] uppercase">Evaluations</h1>
+        <p className="text-sm text-slate-500 mt-1.5 font-playfair italic">
           Monitor all teacher submission evaluations across your institution.
         </p>
       </header>
@@ -136,19 +136,19 @@ export default function AdminEvaluationsPage() {
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total", value: total, color: "text-[#dfc397]" },
+          { label: "Total", value: total, color: "text-brass" },
           { label: "Evaluated", value: statusCounts.evaluated, color: "text-emerald-400" },
-          { label: "Processing", value: statusCounts.processing, color: "text-blue-400" },
+          { label: "Processing", value: statusCounts.processing, color: "text-amber-400" },
           { label: "Failed", value: statusCounts.failed, color: "text-red-400" },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4"
+            className="bg-obsidian border hairline rounded-xl p-4 shadow-md"
           >
-            <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold mb-2">
               {stat.label}
             </p>
-            <p className={`text-3xl font-black ${stat.color}`}>{stat.value}</p>
+            <p className={`text-3xl font-cinzel font-bold ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
       </div>
@@ -159,11 +159,11 @@ export default function AdminEvaluationsPage() {
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer
+            className={`px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer
               ${
                 statusFilter === s
-                  ? "bg-[#991b1b] text-[#f5f2eb] border border-[#991b1b]/60"
-                  : "bg-slate-900/50 text-slate-500 border border-slate-800 hover:border-slate-700 hover:text-slate-300"
+                  ? "bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment"
+                  : "bg-obsidian text-slate-500 border hairline hover:border-brass/50 hover:text-parchment"
               }`}
           >
             {s}
@@ -172,78 +172,79 @@ export default function AdminEvaluationsPage() {
       </div>
 
       {/* ── Table ── */}
-      <section className="bg-slate-900/40 border border-slate-800/60 rounded-2xl overflow-hidden">
+      <section className="bg-obsidian border hairline rounded-xl overflow-hidden shadow-xl">
         {loading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="flex items-center gap-4 animate-pulse">
-                <div className="h-4 bg-slate-800 rounded flex-1" />
-                <div className="h-4 bg-slate-800 rounded w-24" />
-                <div className="h-4 bg-slate-800 rounded w-32" />
-                <div className="h-4 bg-slate-800 rounded w-20" />
+                <div className="h-4 bg-void border hairline rounded flex-1" />
+                <div className="h-4 bg-void border hairline rounded w-24" />
+                <div className="h-4 bg-void border hairline rounded w-32" />
+                <div className="h-4 bg-void border hairline rounded w-20" />
               </div>
             ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <span className="text-4xl opacity-20">📋</span>
-            <p className="text-sm text-slate-600">No submissions yet</p>
+            <p className="text-sm text-slate-600 font-playfair italic">No submissions yet</p>
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-800/60">
-              <tr className="text-left">
-                <th className="px-5 py-3 text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+            <thead className="border-b hairline-w">
+              <tr className="text-left bg-void/50">
+                <th className="px-5 py-4 text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold">
                   Submission ID
                 </th>
-                <th className="px-5 py-3 text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+                <th className="px-5 py-4 text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold">
                   Status
                 </th>
-                <th className="px-5 py-3 text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+                <th className="px-5 py-4 text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold">
                   Score
                 </th>
-                <th className="px-5 py-3 text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+                <th className="px-5 py-4 text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold">
                   Flags
                 </th>
-                <th className="px-5 py-3 text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+                <th className="px-5 py-4 text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold">
                   Submitted
                 </th>
-                <th className="px-5 py-3 text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+                <th className="px-5 py-4 text-[10px] uppercase tracking-[0.22em] text-slate-600 font-bold">
                   View
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/40">
+            <tbody className="divide-y hairline-w divide-solid">
               {filtered.map((sub) => (
                 <tr
                   key={sub.id}
-                  className="hover:bg-slate-800/20 transition-colors"
+                  className="hover:bg-void transition-colors"
                 >
-                  <td className="px-5 py-3.5">
-                    <span className="font-mono text-xs text-slate-400">
+                  <td className="px-5 py-4">
+                    <span className="font-mono text-[11px] text-slate-400 bg-void px-2 py-1 rounded border hairline">
                       {sub.id.slice(0, 8)}…
                     </span>
                   </td>
-                  <td className="px-5 py-3.5">
+                  <td className="px-5 py-4">
                     <StatusBadge status={sub.status} />
                   </td>
-                  <td className="px-5 py-3.5 w-44">
+                  <td className="px-5 py-4 w-44">
                     {sub.status === "evaluated" && sub.score_json?.overall_score != null ? (
                       <ScoreMeter score={sub.score_json.overall_score} />
                     ) : (
                       <span className="text-slate-700 text-xs">—</span>
                     )}
                   </td>
-                  <td className="px-5 py-3.5">
+                  <td className="px-5 py-4">
                     {sub.score_json?.has_plagiarism_flag ? (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-950/50 border border-amber-900/40 text-amber-400 text-[9px] font-black uppercase tracking-wider">
-                        ⚠ Similarity
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-950/60 border border-red-900/60 text-red-400 text-[9px] font-bold uppercase tracking-wider">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        Similarity
                       </span>
                     ) : (
                       <span className="text-slate-700 text-xs">—</span>
                     )}
                   </td>
-                  <td className="px-5 py-3.5 text-xs text-slate-500">
+                  <td className="px-5 py-4 text-[11px] text-slate-500 font-playfair italic">
                     {new Date(sub.created_at).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -251,10 +252,10 @@ export default function AdminEvaluationsPage() {
                       minute: "2-digit",
                     })}
                   </td>
-                  <td className="px-5 py-3.5">
+                  <td className="px-5 py-4">
                     <Link
                       href={`/admin/evaluations/${sub.id}`}
-                      className="text-xs text-[#dfc397] hover:text-[#f5f2eb] font-bold transition-colors"
+                      className="text-[10px] text-brass hover:text-gold uppercase tracking-widest font-bold transition-colors"
                     >
                       Review →
                     </Link>

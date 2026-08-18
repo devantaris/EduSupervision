@@ -1,42 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   Design System Tokens (Academic Registry Theme)
+   Design System Tokens — "The Academic Registry"
+   Unified palette from Kimi mockups
    ───────────────────────────────────────────── */
 :root {
-  --background: #070a10;        /* Deep slate-navy black */
-  --foreground: #f5f2eb;        /* Warm parchment white */
-  --accent-orange: #991b1b;     /* Royal Burgundy */
+  /* Core palette */
+  --void: #070a10;
+  --obsidian: #0c0f16;
+  --burgundy: #991b1b;
+  --crimson: #7f1d1d;
+  --brass: #dfc397;
+  --gold: #c5a367;
+  --parchment: #f5f2eb;
+
+  /* Legacy aliases (used by existing components) */
+  --background: #070a10;
+  --foreground: #f5f2eb;
+  --accent-orange: #991b1b;
   --accent-orange-rgb: 153, 27, 27;
-  --accent-gold: #dfc397;       /* Champagne Brass */
+  --accent-gold: #dfc397;
   --accent-gold-rgb: 223, 195, 151;
-  --accent-copper: #0b212d;     /* Deep Sapphire-Teal */
-  --accent-amber: #1a150c;      /* Aged Gold */
-  
-  --border-hairline: rgba(223, 195, 151, 0.12); /* Champagne hairline */
-  --border-flame: rgba(153, 27, 27, 0.25);      /* Burgundy hairline */
+
+  /* Borders */
+  --hairline: rgba(223, 195, 151, 0.15);
+  --hairline-w: rgba(255, 255, 255, 0.08);
+  --border-hairline: rgba(223, 195, 151, 0.12);
+  --border-flame: rgba(153, 27, 27, 0.25);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-void: var(--void);
+  --color-obsidian: var(--obsidian);
+  --color-burgundy: var(--burgundy);
+  --color-crimson: var(--crimson);
+  --color-brass: var(--brass);
+  --color-gold: var(--gold);
+  --color-parchment: var(--parchment);
+
+  /* Legacy aliases */
   --color-flame: var(--accent-orange);
-  --color-gold: var(--accent-gold);
-  --color-copper: var(--accent-copper);
-  --color-amber: var(--accent-amber);
-  
+  --color-copper: #0b212d;
+  --color-amber: #1a150c;
+
   --font-serif: "Lora", Georgia, serif;
   --font-serif-display: "Cinzel", Georgia, serif;
+  --font-playfair: "Playfair Display", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-cinzel: "Cinzel", Georgia, serif;
+  --font-jakarta: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
 }
 
 /* ─────────────────────────────────────────────
-   Base Styles & Reset
+   Base Styles
    ───────────────────────────────────────────── */
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
@@ -45,7 +66,10 @@ html {
 }
 
 body {
-  background: var(--background);
+  background-color: var(--void);
+  background-image:
+    radial-gradient(1200px 600px at 80% -10%, rgba(153, 27, 27, 0.14), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(197, 163, 103, 0.07), transparent 60%);
   color: var(--foreground);
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -55,11 +79,11 @@ body {
 }
 
 /* ─────────────────────────────────────────────
-   Custom Editorial Scrollbar
+   Scrollbar — Chancery
    ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -67,73 +91,40 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(223, 195, 151, 0.15); /* Champagne alpha */
-  border-radius: 2px;
-  transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  background: rgba(223, 195, 151, 0.18);
+  border-radius: 8px;
+  transition: background 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-orange); /* Burgundy accent on hover */
+  background: var(--burgundy);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(223, 195, 151, 0.15) #05070b;
+  scrollbar-color: rgba(223, 195, 151, 0.18) #05070b;
 }
 
 /* ─────────────────────────────────────────────
    Selection
    ───────────────────────────────────────────── */
 ::selection {
-  background: var(--accent-orange);
+  background: var(--burgundy);
   color: #ffffff;
 }
 
 /* ─────────────────────────────────────────────
-   Premium Typographic Gradients
+   Hairline Borders — Kimi utility classes
    ───────────────────────────────────────────── */
-.gradient-text {
-  background: linear-gradient(
-    135deg,
-    var(--accent-gold) 0%,
-    #ffffff 45%,
-    var(--accent-orange) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+.hairline {
+  border-color: var(--hairline);
 }
 
-.gradient-text-gold {
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    var(--accent-gold) 60%,
-    #c4a372 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+.hairline-w {
+  border-color: var(--hairline-w);
 }
 
-.gradient-text-flame {
-  background: linear-gradient(
-    135deg,
-    var(--accent-orange) 0%,
-    #cc3b3b 50%,
-    var(--accent-gold) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-/* ─────────────────────────────────────────────
-   Asymmetrical Editorial Borders
-   ───────────────────────────────────────────── */
+/* Legacy border classes */
 .border-hairline {
   border: 1px solid var(--border-hairline);
 }
@@ -155,7 +146,164 @@ body {
 }
 
 /* ─────────────────────────────────────────────
-   Atelier Glassmorphism
+   Nav Items — Sidebar navigation states
+   ───────────────────────────────────────────── */
+.nav-item {
+  transition: all 0.18s ease;
+}
+
+.nav-item:hover {
+  background: rgba(223, 195, 151, 0.06);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(153, 27, 27, 0.35), rgba(153, 27, 27, 0.06));
+  box-shadow: inset 3px 0 0 #991b1b;
+}
+
+/* ─────────────────────────────────────────────
+   Form Fields — Kimi field styling
+   ───────────────────────────────────────────── */
+.field {
+  background: rgba(7, 10, 16, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.field:focus {
+  border-color: rgba(223, 195, 151, 0.45);
+}
+
+/* ─────────────────────────────────────────────
+   Quote Paper — Parchment evidence cards
+   ───────────────────────────────────────────── */
+.quote-paper {
+  background: #f5f2eb;
+  background-image: linear-gradient(rgba(12, 15, 22, 0.035) 1px, transparent 1px);
+  background-size: 100% 1.65rem;
+}
+
+/* ─────────────────────────────────────────────
+   Score Ring — SVG evaluation ring
+   ───────────────────────────────────────────── */
+.ring-track {
+  stroke: rgba(223, 195, 151, 0.12);
+}
+
+.ring-fill {
+  stroke: url(#goldGrad);
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 14px rgba(197, 163, 103, 0.45));
+  stroke-dasharray: 502.65;
+  stroke-dashoffset: 502.65;
+  animation: ringIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+@keyframes ringIn {
+  to {
+    stroke-dashoffset: var(--ring-offset, 60.32);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Histogram Bars
+   ───────────────────────────────────────────── */
+.bar {
+  transition: height 0.4s ease, filter 0.2s ease;
+}
+
+.bar:hover {
+  filter: brightness(1.35);
+}
+
+/* ─────────────────────────────────────────────
+   Range Slider — Rubric weight calculator
+   ───────────────────────────────────────────── */
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #c5a367 var(--fill, 50%), rgba(255, 255, 255, 0.1) var(--fill, 50%));
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #dfc397;
+  border: 2px solid #7f1d1d;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+input[type=range]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #dfc397;
+  border: 2px solid #7f1d1d;
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────
+   Pulse Dot — Live connection indicator
+   ───────────────────────────────────────────── */
+.pulse-dot {
+  position: relative;
+}
+
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(74, 222, 128, 0.6);
+  animation: ping-ring 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping-ring {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* ─────────────────────────────────────────────
+   Gradient Texts
+   ───────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--brass) 0%, #ffffff 45%, var(--burgundy) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #ffffff 0%, var(--brass) 60%, #c4a372 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.gradient-text-flame {
+  background: linear-gradient(135deg, var(--burgundy) 0%, #cc3b3b 50%, var(--brass) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ─────────────────────────────────────────────
+   Glassmorphism
    ───────────────────────────────────────────── */
 .atelier-glass {
   background: rgba(7, 10, 16, 0.7);
@@ -172,22 +320,15 @@ body {
 }
 
 /* ─────────────────────────────────────────────
-   @keyframes: drift-organic
-   Highly slowed (45s) breathing morphs for state audits
+   Animations
    ───────────────────────────────────────────── */
+
+/* Slow breathing morphs for state audits (45s) */
 @keyframes drift-organic {
-  0% {
-    transform: translate(0px, 0px) scale(1) rotate(0deg);
-  }
-  33% {
-    transform: translate(30px, -45px) scale(1.1) rotate(120deg);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.95) rotate(240deg);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1) rotate(360deg);
-  }
+  0%   { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33%  { transform: translate(30px, -45px) scale(1.1) rotate(120deg); }
+  66%  { transform: translate(-20px, 20px) scale(0.95) rotate(240deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(360deg); }
 }
 
 .animate-drift-organic {
@@ -198,36 +339,20 @@ body {
   animation: drift-organic 60s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* ─────────────────────────────────────────────
-   @keyframes: float-elastic
-   Dignified slow bobbing
-   ───────────────────────────────────────────── */
+/* Dignified slow bobbing */
 @keyframes float-elastic {
-  0%, 100% {
-    transform: translateY(0px) scale(1);
-  }
-  50% {
-    transform: translateY(-6px) scale(1.01);
-  }
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%      { transform: translateY(-6px) scale(1.01); }
 }
 
 .animate-float-elastic {
   animation: float-elastic 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
 }
 
-/* ─────────────────────────────────────────────
-   @keyframes: slate-reveal
-   Monumental, slow, heavy entry reveals (1.3s)
-   ───────────────────────────────────────────── */
+/* Monumental entry reveals (1.3s) */
 @keyframes slate-reveal {
-  0% {
-    opacity: 0;
-    transform: translateY(30px) skewY(1deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0px) skewY(0deg);
-  }
+  0%   { opacity: 0; transform: translateY(30px) skewY(1deg); }
+  100% { opacity: 1; transform: translateY(0px) skewY(0deg); }
 }
 
 .animate-slate-reveal {
@@ -246,48 +371,25 @@ body {
   animation: slate-reveal 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
 }
 
-/* ─────────────────────────────────────────────
-   @keyframes: pulse-ring
-   Slower (8s) breathing ring pulse for status logs
-   ───────────────────────────────────────────── */
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.96);
-    box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0.35);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 8px rgba(var(--accent-orange-rgb), 0);
-  }
-  100% {
-    transform: scale(0.96);
-    box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0);
-  }
+/* Breathing ring pulse for status indicators (6s) */
+@keyframes pulse-ring-slow {
+  0%   { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0.35); }
+  70%  { transform: scale(1); box-shadow: 0 0 0 8px rgba(var(--accent-orange-rgb), 0); }
+  100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(var(--accent-orange-rgb), 0); }
 }
 
 .animate-pulse-ring {
-  animation: pulse-ring 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-ring-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* ─────────────────────────────────────────────
-   Shimmer Effect
-   ───────────────────────────────────────────── */
+/* Shimmer effect */
 @keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 
 .animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(223, 195, 151, 0.05) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, rgba(223, 195, 151, 0.05) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 4s linear infinite;
 }
@@ -296,6 +398,6 @@ body {
    Focus ring override — champagne brass
    ───────────────────────────────────────────── */
 :focus-visible {
-  outline: 1.5px solid var(--accent-gold);
+  outline: 1.5px solid var(--brass);
   outline-offset: 3px;
 }

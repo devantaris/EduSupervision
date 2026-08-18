@@ -24,6 +24,9 @@ class Settings(BaseSettings):
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
             elif v.startswith("postgres://"):
                 v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+            # asyncpg expects ?ssl=require, not ?sslmode=require
+            if "sslmode=" in v:
+                v = v.replace("sslmode=", "ssl=")
             return v
         
         # Build asyncpg connection URL
@@ -56,6 +59,10 @@ class Settings(BaseSettings):
     AWS_REGION_NAME: str = "us-east-1"
     S3_BUCKET_NAME: str = "edusupervision-uploads"
 
+    # Email Settings (Resend / SendGrid)
+    RESEND_API_KEY: Optional[str] = None
+    EMAIL_FROM: str = "onboarding@resend.dev"
+
     # Environment
     ENVIRONMENT: str = "development"
 
@@ -63,6 +70,7 @@ class Settings(BaseSettings):
         env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
         env_file_encoding="utf-8",
         case_sensitive=True,
+        extra="ignore",
     )
 
 

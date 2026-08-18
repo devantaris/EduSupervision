@@ -47,6 +47,10 @@ logs/
 # Alembic
 alembic/versions/__pycache__/
 
+# Keys
+*.pem
+
 # Mockups
 *.zip
 kimi_mockups/
+scripts/

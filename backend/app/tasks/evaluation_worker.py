@@ -217,7 +217,7 @@ def _extract_with_gemini_vision(s3_key: str) -> str:
         import pathlib
 
         local_path = _resolve_local_path(s3_key)
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        model = genai.GenerativeModel("gemini-3.6-flash")
 
         with open(local_path, "rb") as f:
             file_bytes = f.read()
@@ -324,9 +324,10 @@ def _embed_with_mock_or_real(chunks: list[str]) -> Optional[list[float]]:
         all_embeddings = []
         for chunk in chunks:
             result = genai.embed_content(
-                model="models/text-embedding-004",
+                model="models/gemini-embedding-001",
                 content=chunk,
                 task_type="retrieval_document",
+                output_dimensionality=768,
             )
             all_embeddings.append(result["embedding"])
 
@@ -548,7 +549,7 @@ def _run_gemini_evaluation(text: str, rubric: dict, submission_id: str) -> dict:
 
         # Pass 1
         model_flash = genai.GenerativeModel(
-            "gemini-2.0-flash",
+            "gemini-3.6-flash",
             system_instruction=system_prompt,
         )
         resp1 = model_flash.generate_content(
@@ -556,7 +557,7 @@ def _run_gemini_evaluation(text: str, rubric: dict, submission_id: str) -> dict:
             generation_config=genai.GenerationConfig(
                 response_mime_type="application/json",
                 temperature=0.1,
-                max_output_tokens=2048,
+                max_output_tokens=8192,
             ),
         )
         result1 = json.loads(resp1.text)
@@ -567,7 +568,7 @@ def _run_gemini_evaluation(text: str, rubric: dict, submission_id: str) -> dict:
             generation_config=genai.GenerationConfig(
                 response_mime_type="application/json",
                 temperature=0.1,
-                max_output_tokens=2048,
+                max_output_tokens=8192,
             ),
         )
         result2 = json.loads(resp2.text)
@@ -581,9 +582,9 @@ def _run_gemini_evaluation(text: str, rubric: dict, submission_id: str) -> dict:
         )
 
         if max_delta > 5:
-            logger.info(f"[Stage 4] Score delta {max_delta} > 5 — escalating to gemini-1.5-pro")
+            logger.info(f"[Stage 4] Score delta {max_delta} > 5 — escalating to deterministic flash pass")
             model_pro = genai.GenerativeModel(
-                "gemini-1.5-pro",
+                "gemini-3.6-flash",
                 system_instruction=system_prompt,
             )
             resp_pro = model_pro.generate_content(
@@ -591,7 +592,7 @@ def _run_gemini_evaluation(text: str, rubric: dict, submission_id: str) -> dict:
                 generation_config=genai.GenerationConfig(
                     response_mime_type="application/json",
                     temperature=0.0,
-                    max_output_tokens=2048,
+                    max_output_tokens=8192,
                 ),
             )
             return json.loads(resp_pro.text)

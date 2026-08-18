@@ -126,6 +126,7 @@ export default function AdminEvaluationDetailPage() {
   const router = useRouter();
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [evaluating, setEvaluating] = useState(false);
   const [error, setError] = useState("");
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -148,6 +149,22 @@ export default function AdminEvaluationDetailPage() {
       setLoading(false);
     }
   }, [params.id]);
+
+  const handleTriggerEvaluation = async () => {
+    setEvaluating(true);
+    try {
+      const res = await apiFetch(`/api/v1/submissions/${params.id}/evaluate`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        await fetchSubmission();
+      }
+    } catch (err) {
+      console.error("Evaluation trigger error:", err);
+    } finally {
+      setEvaluating(false);
+    }
+  };
 
   useEffect(() => {
     fetchSubmission();
@@ -221,6 +238,24 @@ export default function AdminEvaluationDetailPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleTriggerEvaluation}
+            disabled={evaluating}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-gradient-to-r from-burgundy to-crimson border border-brass/30 text-parchment hover:brightness-110 text-[10px] uppercase tracking-widest font-bold transition-all shadow-lg shadow-burgundy/25 disabled:opacity-50 cursor-pointer"
+          >
+            {evaluating ? (
+              <>
+                <div className="w-3 h-3 rounded-full border border-parchment border-t-transparent animate-spin" />
+                Running Gemini AI…
+              </>
+            ) : (
+              <>
+                <span>⚡</span>
+                {isEvaluated ? "Re-Run Gemini AI" : "Run Live Gemini AI"}
+              </>
+            )}
+          </button>
+          
           <button
             onClick={() => window.print()}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-void hover:bg-white/5 border hairline text-brass hover:text-gold text-[10px] uppercase tracking-widest font-bold transition-all cursor-pointer"
